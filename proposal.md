@@ -1,7 +1,7 @@
 # Major project proposal
 
 ## Description
-- what I'm building
+- 
 
 ## Needs to have
 - requirement 1

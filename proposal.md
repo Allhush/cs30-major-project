@@ -77,3 +77,4 @@
   - etc.
 - difficulty level
 - Upgrade existing troops
+- Local Player vs Player mode

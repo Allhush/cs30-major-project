@@ -12,35 +12,26 @@
 - multiple troop types with different attacks
   - sword troop
     - short range troop that will have higher health
-  - archer
-    - long range troop that will have higher damage but lower health
-  - healer
-    - will be able to heal nearby friendly troops
+ - Spearman
+    - longer range than the sword troop, but less effective at close range
 - multiple enemy types with different attacks
   - zombie
     - standard enemy
   - skeleton
     - higher damage than zombie but lower health
-  - buff monster
-    - higher health
-    - higher damage
-    - more rare(possibly miniboss at lvl 3?)
 - Waves that become more difficult over time
   - more monsters
-  - monsters have more health
   - increased monster variation
-- at least 5 waves
-- at least 1 boss monster at wave 5
-  - unique attack
-  - healing factor?
-  - cool sprite
+- at least 1 boss monster
 - ability to move troops to desired areas
   - select troops and move them to a certain areas 
   - place troops where you want pn screen
 - sound effects
-   - sword slash
-   - bow release
-   - healing aura
+  - sword slash
+  - spear clank
+  - zombie groan
+  - skeleton clink
+
 
 
 
@@ -52,11 +43,18 @@
 - even more troops
   - mage
   - Catapult
-  - Spearman
+  - archer
+    - long range troop that will have higher damage but lower health
+  - healer
+    - will be able to heal nearby friendly troops
 - even more monsters
   - healer/archer targeting monster
   - Lich
   - Vampire
+  - buff monster
+    - higher health
+    - higher damage
+    - more rare(possibly miniboss at lvl 3?)
 - charge mechanics?
 - powerups
   - ability to heal troops
@@ -65,9 +63,8 @@
 - more sound effects
   - magic ray
   - catapult thwack
-  - spear clank
-  - zombie groan
-  - skeleton clink
+  - bow release
+  - healing aura
   - buff monster roar
   - lich summoning
   - vampire blood sucking?

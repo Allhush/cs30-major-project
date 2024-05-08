@@ -7,6 +7,7 @@
 
 let theTroops = [];
 let theEnemies = [];
+let coins = 0;
 
 class SwordTroop{
   constructor(x,y){
@@ -14,7 +15,7 @@ class SwordTroop{
     this.y = y;
     this.health = 100;
     this.damage = 10;
-    this.height = 50;
+    this.height = 30;
     this.width = 30;
     this.cost = 20;
     this.colour = "black";
@@ -44,12 +45,13 @@ class Zombie{
     this.y = y;
     this.health = 50;
     this.damage = 10;
-    this.speed = 20;
-    this.height = 50;
+    this.speed = 2;
+    this.height = 30;
     this.width = 30;
     this.colour = "green";
     this.coin = 5;
     this.range = 20;
+    this.attackState = "calm";
   }
 
   display(){
@@ -64,7 +66,21 @@ class Zombie{
       console.log("I'm dead");
     }
   }
-  
+
+  attackTroops(theTroops){
+    for(let target of theTroops){
+      let enemyDistance = dist(this.x, this.y, target.x, target.y);
+      if(enemyDistance < this.range && frameCount%10 === 0){
+        target.health -= this.damage;
+      }
+    }
+  }
+
+  move(){
+    if(this.attackState === "calm" && this.x < width){
+      this.x += this.speed;
+    }
+  }
 
 }
 
@@ -80,9 +96,10 @@ function draw() {
   }
   for(let enemy of theEnemies){
     enemy.display();
-    enemy.registerDeath();
+    enemy.attackTroops(theTroops);
+    enemy.move();
   }
-
+  killTheDead();
 }
 
 function mousePressed(){
@@ -93,5 +110,19 @@ function mousePressed(){
   if(keyIsDown(67)){
     let someEnemy = new Zombie(mouseX, mouseY);
     theEnemies.push(someEnemy);
+  }
+}
+
+function killTheDead(){
+  for(let i = theEnemies.length - 1; i >= 0; i --){
+    if(theEnemies[i].health <= 0){
+      coins += theEnemies[i].coin;
+      theEnemies.splice(i, 1);
+    }
+  }
+  for(let j = theTroops.length - 1; j >= 0; j --){
+    if(theTroops[j].health <= 0){
+      theTroops.splice(j, 1);
+    }
   }
 }

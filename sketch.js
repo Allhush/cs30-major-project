@@ -52,6 +52,8 @@ class Zombie{
     this.coin = 5;
     this.range = 20;
     this.attackState = "calm";
+    this.closestTroop = width;
+    this.closestTroopIndex = 0;
   }
 
   display(){
@@ -76,9 +78,39 @@ class Zombie{
     }
   }
 
+  seeTroops(theTroops){
+    for(let target = theTroops.length - 1; target >= 0; target --){
+      let enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      if(enemyDistance < 300){
+        this.attackState = "agitated";
+        if(enemyDistance < this.closestTroop){
+          this.closestTroop = enemyDistance;
+          this.closestTroopIndex = target;
+        }
+      }
+      if(theTroops.length - 1 < this.closestTroopIndex){
+        this.attackState = "calm";
+      }
+    }
+  }
+  
   move(){
     if(this.attackState === "calm" && this.x < width){
       this.x += this.speed;
+    }
+    if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+      if(theTroops[this.closestTroopIndex].x > this.x){
+        this.x += this.speed;
+      }
+      if(theTroops[this.closestTroopIndex].y > this.y){
+        this.y += this.speed;
+      }
+      if(theTroops[this.closestTroopIndex].y < this.y){
+        this.y -= this.speed;
+      }
+      if(theTroops[this.closestTroopIndex].x < this.x){
+        this.x -= this.speed;
+      }
     }
   }
 
@@ -97,7 +129,11 @@ function draw() {
   for(let enemy of theEnemies){
     enemy.display();
     enemy.attackTroops(theTroops);
+    enemy.seeTroops(theTroops);
     enemy.move();
+    if(theTroops.length === 0){
+      enemy.attackState = "calm";
+    }
   }
   killTheDead();
 }

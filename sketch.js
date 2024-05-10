@@ -138,6 +138,17 @@ class Zombie{
     }
   }
 
+  target(pointsArray){
+    for(let otherPoint of pointsArray){
+      let pointDistance = dist(this.x, this.y, otherPoint.x, otherPoint.y);
+      if(pointDistance < this.agitationRange){
+        stroke("green");
+        line(this.x, this.y, otherPoint.x, otherPoint.y);
+      }
+      
+    }
+  }
+
 }
 
 function setup() {
@@ -157,6 +168,7 @@ function draw() {
     enemy.attackTroops(theTroops);
     enemy.seeTroops(theTroops);
     enemy.move();
+    enemy.target(theTroops);
     if(theTroops.length === 0){
       enemy.attackState = "calm";
     }

@@ -9,6 +9,7 @@ let theTroops = [];
 let theEnemies = [];
 let coins = 0;
 
+
 class SwordTroop{
   constructor(x,y){
     this.x = x;
@@ -20,6 +21,7 @@ class SwordTroop{
     this.cost = 20;
     this.colour = "black";
     this.range = 50;
+    this.liftState = false;
   }
 
   display(){
@@ -37,6 +39,23 @@ class SwordTroop{
       }
     }
   }
+
+  mouseMoveSetup(){
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
+      this.liftState = true;
+    }
+    else{
+      this.liftState = false;
+    }
+  }
+
+  mouseMove(){
+    if(this.liftState){
+      this.x = mouseX;
+      this.y = mouseY;
+    }
+  }
+
 }
 
 class Zombie{
@@ -54,6 +73,7 @@ class Zombie{
     this.attackState = "calm";
     this.closestTroop = width;
     this.closestTroopIndex = 0;
+    this.agitationRange = 120;
   }
 
   display(){
@@ -81,9 +101,9 @@ class Zombie{
   seeTroops(theTroops){
     for(let target = theTroops.length - 1; target >= 0; target --){
       let enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      if(enemyDistance < 300){
+      if(enemyDistance < this.agitationRange){
         this.attackState = "agitated";
-        if(enemyDistance < this.closestTroop){
+        if(enemyDistance < this.closestTroop && enemyDistance){
           this.closestTroop = enemyDistance;
           this.closestTroopIndex = target;
         }
@@ -125,6 +145,8 @@ function draw() {
   for(let troops of theTroops){
     troops.display();
     troops.attackTroops(theEnemies);
+    troops.mouseMove();
+    troops.mouseMoveSetup();
   }
   for(let enemy of theEnemies){
     enemy.display();

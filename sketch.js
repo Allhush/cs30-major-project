@@ -74,6 +74,7 @@ class Zombie{
     this.closestTroop = width;
     this.closestTroopIndex = 0;
     this.agitationRange = 120;
+    this.enemyDistance = width;
   }
 
   display(){
@@ -91,8 +92,8 @@ class Zombie{
 
   attackTroops(theTroops){
     for(let target of theTroops){
-      let enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(enemyDistance < this.range && frameCount%10 === 0){
+      this.enemyDistance = dist(this.x, this.y, target.x, target.y);
+      if(this.enemyDistance < this.range && frameCount%10 === 0){
         target.health -= this.damage;
       }
     }
@@ -100,11 +101,11 @@ class Zombie{
 
   seeTroops(theTroops){
     for(let target = theTroops.length - 1; target >= 0; target --){
-      let enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      if(enemyDistance < this.agitationRange){
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      if(this.enemyDistance < this.agitationRange){
         this.attackState = "agitated";
-        if(enemyDistance < this.closestTroop && enemyDistance){
-          this.closestTroop = enemyDistance;
+        if(this.enemyDistance < this.closestTroop){
+          this.closestTroop = this.enemyDistance;
           this.closestTroopIndex = target;
         }
       }
@@ -131,6 +132,9 @@ class Zombie{
       if(theTroops[this.closestTroopIndex].x < this.x){
         this.x -= this.speed;
       }
+    }
+    if (this.enemyDistance > this.agitationRange){
+      this.attackState = "calm";
     }
   }
 

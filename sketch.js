@@ -5,42 +5,67 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+const SWORDCOST = 20;
+
+// holds all of the troops bought by the player
 let theTroops = [];
+// hold all of the enemies that spawn
 let theEnemies = [];
-let coins = 0;
+// holds the coins the player uses to buy troops
+let coins = 100;
 
-
+// most basic troop that the player can buy
 class SwordTroop{
   constructor(x,y){
+    // troops x value
     this.x = x;
+    // troops y value
     this.y = y;
+    // troops health
     this.health = 100;
+    // troops damage
     this.damage = 10;
+    // troops height
     this.height = 30;
+    // troops width
     this.width = 30;
-    this.cost = 20;
+    // troops coin cost
+    this.cost = SWORDCOST;
+    // temporary color for the sword troop
     this.colour = "black";
+    // range the sword troop can attack from
     this.range = 50;
+    // checks if the player is moving the troop
     this.liftState = false;
   }
 
+  // displays the troop
   display(){
     noStroke();
+    // centers troop
     rectMode(CENTER);
+    // sets troops temporary color
     fill(this.colour);
+    // places troop at correct position with correct height and length
     rect(this.x, this.y, this.width, this.height);
   }
 
+  // lets troops attack enemies
   attackTroops(theEnemies){
+    // goes through all the enemies
     for(let target of theEnemies){
+      // checks range
       let enemyDistance = dist(this.x, this.y, target.x, target.y);
+      // attacks enemies
       if(enemyDistance < this.range && frameCount%10 === 0){
         target.health -= this.damage;
       }
     }
   }
 
+  // checks if the player is trying to move the troops
   mouseMoveSetup(){
+    // checks values to see if the player is trying to move
     if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
       this.liftState = true;
     }
@@ -49,6 +74,7 @@ class SwordTroop{
     }
   }
 
+  // moves troops
   mouseMove(){
     if(this.liftState){
       this.x = mouseX;
@@ -58,6 +84,8 @@ class SwordTroop{
 
 }
 
+
+// simplest enemy
 class Zombie{
   constructor(x,y){
     this.x = x;

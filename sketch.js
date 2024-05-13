@@ -88,6 +88,7 @@ class SwordTroop{
 // simplest enemy
 class Zombie{
   constructor(x,y){
+    // almost identacle to swordTroop definitions, look above to see
     this.x = x;
     this.y = y;
     this.health = 50;
@@ -154,7 +155,7 @@ class Zombie{
       // resets aggresion once the zombies have killed a troop
       if(theTroops.length - 1 < this.closestTroopIndex){
         this.attackState = "calm";
-        this.closestTroopIndex = 0;
+        this.closestTroopIndex = target;
         this.closestTroop = width;
       }
     }
@@ -217,25 +218,25 @@ function draw() {
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
     // meant to test responses to certatin situations, key needs to be pressed to carry out functions
-    if(keyIsDown(65)){
-      enemy.attackState = "calm";
-      enemy.display();
-      enemy.attackTroops(theTroops);
-      enemy.seeTroops(theTroops);
-      enemy.move();
-      enemy.target(theTroops);
-      if(theTroops.length === 0){
-        enemy.attackState = "calm";
-      }
-    }
-    // same as above
-    if(keyIsDown(70)){
+    enemy.attackState = "calm";
+    enemy.display();
+    enemy.attackTroops(theTroops);
+    enemy.seeTroops(theTroops);
+    enemy.move();
+    enemy.target(theTroops);
+    if(theTroops.length === 0){
       enemy.attackState = "calm";
     }
-    // same as above
-    else{
-      enemy.attackState = "stop";
-    }
+    // if(keyIsDown(65)){
+    // }
+    // // same as above
+    // if(keyIsDown(70)){
+    //   enemy.attackState = "calm";
+    // }
+    // // same as above
+    // else{
+    //   enemy.attackState = "stop";
+    // }
   }
   // gets rid of dead enemies/troops
   killTheDead();

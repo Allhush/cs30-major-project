@@ -154,6 +154,8 @@ class Zombie{
       // resets aggresion once the zombies have killed a troop
       if(theTroops.length - 1 < this.closestTroopIndex){
         this.attackState = "calm";
+        this.closestTroopIndex = 0;
+        this.closestTroop = width;
       }
     }
   }
@@ -245,27 +247,36 @@ function mousePressed(){
     let someTroop = new SwordTroop(mouseX, mouseY);
     theTroops.push(someTroop);
   }
-  // 
+  // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
   if(keyIsDown(67)){
     let someEnemy = new Zombie(mouseX, mouseY);
     theEnemies.push(someEnemy);
   }
 }
 
+// gets rid of dead troops/enemies
 function killTheDead(){
+  // looks through all enemies
   for(let i = theEnemies.length - 1; i >= 0; i --){
+    // checks to see if the enemies still have health
     if(theEnemies[i].health <= 0){
+      // add enemy coins to purse
       coins += theEnemies[i].coin;
+      // gets rid of enemy
       theEnemies.splice(i, 1);
     }
   }
+  // looks through all troops
   for(let j = theTroops.length - 1; j >= 0; j --){
+    // checks to see if troops still have health
     if(theTroops[j].health <= 0){
+      // kills troops without health
       theTroops.splice(j, 1);
     }
   }
 }
 
+// will eventually spawn enemies in waves based on difficulty
 function spawnEnemies(){
 
 }

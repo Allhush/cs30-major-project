@@ -5,7 +5,10 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+// cost of sword troop
 const SWORDCOST = 20;
+// zombie danger value
+const ZOMBIEDANGER = 10;
 
 // holds all of the troops bought by the player
 let theTroops = [];
@@ -13,6 +16,10 @@ let theTroops = [];
 let theEnemies = [];
 // holds the coins the player uses to buy troops
 let coins = 100;
+// danger value of the wave of the wave 
+let dangerScore = 100;
+// counts rounds
+let roundCounter = 0;
 
 // most basic troop that the player can buy
 class SwordTroop{
@@ -151,6 +158,9 @@ class Zombie{
           this.closestTroop = this.enemyDistance;
           this.closestTroopIndex = target;
         }
+        else{
+          this.closestTroopIndex = target;
+        }
       }
       // resets aggresion once the zombies have killed a troop
       if(theTroops.length - 1 < this.closestTroopIndex){
@@ -209,6 +219,7 @@ function setup() {
 function draw() {
   background(220);
   // carries out functions needed to control the troops
+  spawnEnemies();
   for(let troops of theTroops){
     troops.display();
     troops.attackTroops(theEnemies);
@@ -217,13 +228,23 @@ function draw() {
   }
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
-    // meant to test responses to certatin situations, key needs to be pressed to carry out functions
-    enemy.attackState = "calm";
+    
     enemy.display();
     enemy.attackTroops(theTroops);
     enemy.seeTroops(theTroops);
     enemy.move();
     enemy.target(theTroops);
+    // meant to test responses to certatin situations, key needs to be pressed to carry out functions
+    // if(keyIsDown(65)){
+    //   enemy.display();
+    //   enemy.attackTroops(theTroops);
+    //   enemy.seeTroops(theTroops);
+    //   enemy.move();
+    //   enemy.target(theTroops);
+    // }
+    // else{
+    //   enemy.attackState = "stop";
+    // }
     if(theTroops.length === 0){
       enemy.attackState = "calm";
     }
@@ -240,19 +261,6 @@ function draw() {
   }
   // gets rid of dead enemies/troops
   killTheDead();
-}
-
-function mousePressed(){
-  // spawns troops
-  if(keyIsDown(90)){
-    let someTroop = new SwordTroop(mouseX, mouseY);
-    theTroops.push(someTroop);
-  }
-  // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
-  if(keyIsDown(67)){
-    let someEnemy = new Zombie(mouseX, mouseY);
-    theEnemies.push(someEnemy);
-  }
 }
 
 // gets rid of dead troops/enemies
@@ -277,7 +285,32 @@ function killTheDead(){
   }
 }
 
+function mousePressed(){
+  // spawns troops
+  if(keyIsDown(90)){
+    let someTroop = new SwordTroop(mouseX, mouseY);
+    theTroops.push(someTroop);
+  }
+  // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
+  if(keyIsDown(67)){
+    let someEnemy = new Zombie(mouseX, mouseY);
+    theEnemies.push(someEnemy);
+  }
+}
+
+
 // will eventually spawn enemies in waves based on difficulty
 function spawnEnemies(){
-
+  // makes sure all previous enemies are dead
+  if(theEnemies.length <= 1){
+    // adds enemies based on the danger score
+    for(let q = dangerScore; q > 0; q -= ZOMBIEDANGER){
+      let someEnemy = new Zombie(30, random(30, height - 30));
+      theEnemies.push(someEnemy);
+    }
+    // increases danger score for next round
+    dangerScore += Math.round(2,4)*10;
+    // increases the round number
+    roundCounter ++;
+  }
 }

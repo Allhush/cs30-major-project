@@ -29,7 +29,7 @@ class SwordTroop{
     // troops y value
     this.y = y;
     // troops health
-    this.health = 100;
+    this.health = 200;
     // troops damage
     this.damage = 10;
     // troops height
@@ -64,7 +64,7 @@ class SwordTroop{
       // checks range
       let enemyDistance = dist(this.x, this.y, target.x, target.y);
       // attacks enemies
-      if(enemyDistance < this.range && frameCount%10 === 0){
+      if(enemyDistance < this.range && frameCount%15 === 0){
         target.health -= this.damage;
       }
     }
@@ -98,8 +98,8 @@ class Zombie{
     // almost identacle to swordTroop definitions, look above to see
     this.x = x;
     this.y = y;
-    this.health = 50;
-    this.damage = 10;
+    this.health = 500000;
+    this.damage = 0;
     this.speed = 2;
     this.height = 30;
     this.width = 30;
@@ -137,7 +137,7 @@ class Zombie{
   attackTroops(theTroops){
     for(let target of theTroops){
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(this.enemyDistance < this.range && frameCount%10 === 0){
+      if(this.enemyDistance < this.range && frameCount%30 === 0){
         target.health -= this.damage;
       }
     }
@@ -155,13 +155,18 @@ class Zombie{
         this.attackState = "agitated";
         // targets closest troop if they're bunched up
         if(this.enemyDistance < this.closestTroop){
-          this.closestTroop = this.enemyDistance;
           this.closestTroopIndex = target;
+          this.closestTroop = this.enemyDistance;
+          
         }
         else{
           this.closestTroopIndex = target;
         }
       }
+      // stops when close to troops
+      // if(this.enemyDistance < this.width){
+      //   this.attackState = "attack";
+      // }
       // resets aggresion once the zombies have killed a troop
       if(theTroops.length - 1 < this.closestTroopIndex){
         this.attackState = "calm";
@@ -219,7 +224,7 @@ function setup() {
 function draw() {
   background(220);
   // carries out functions needed to control the troops
-  spawnEnemies();
+  // spawnEnemies();
   for(let troops of theTroops){
     troops.display();
     troops.attackTroops(theEnemies);
@@ -229,35 +234,26 @@ function draw() {
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
     
-    enemy.display();
-    enemy.attackTroops(theTroops);
-    enemy.seeTroops(theTroops);
-    enemy.move();
-    enemy.target(theTroops);
+    // enemy.display();
+    // enemy.attackTroops(theTroops);
+    // enemy.seeTroops(theTroops);
+    // enemy.move();
+    // enemy.target(theTroops);
     // meant to test responses to certatin situations, key needs to be pressed to carry out functions
-    // if(keyIsDown(65)){
-    //   enemy.display();
-    //   enemy.attackTroops(theTroops);
-    //   enemy.seeTroops(theTroops);
-    //   enemy.move();
-    //   enemy.target(theTroops);
-    // }
-    // else{
-    //   enemy.attackState = "stop";
-    // }
+    if(keyIsDown(65)){
+      enemy.display();
+      enemy.attackTroops(theTroops);
+      enemy.seeTroops(theTroops);
+      enemy.move();
+      enemy.target(theTroops);
+    }
+    else{
+      enemy.attackState = "stop";
+    }
     if(theTroops.length === 0){
       enemy.attackState = "calm";
     }
-    // if(keyIsDown(65)){
-    // }
-    // // same as above
-    // if(keyIsDown(70)){
-    //   enemy.attackState = "calm";
-    // }
-    // // same as above
-    // else{
-    //   enemy.attackState = "stop";
-    // }
+    // console.log(enemy.health);
   }
   // gets rid of dead enemies/troops
   killTheDead();
@@ -302,15 +298,16 @@ function mousePressed(){
 // will eventually spawn enemies in waves based on difficulty
 function spawnEnemies(){
   // makes sure all previous enemies are dead
-  if(theEnemies.length <= 1){
+  if(theEnemies.length < 1){
     // adds enemies based on the danger score
     for(let q = dangerScore; q > 0; q -= ZOMBIEDANGER){
-      let someEnemy = new Zombie(30, random(30, height - 30));
+      let someEnemy = new Zombie(30 + random(-10, 10), random(30, height - 30));
       theEnemies.push(someEnemy);
     }
     // increases danger score for next round
-    dangerScore += Math.round(2,4)*10;
+    dangerScore += Math.round(random(2,4))*10;
     // increases the round number
     roundCounter ++;
+    console.log(theEnemies.length);
   }
 }

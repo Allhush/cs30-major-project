@@ -99,7 +99,7 @@ class Zombie{
     this.x = x;
     this.y = y;
     this.health = 500000;
-    this.damage = 0;
+    this.damage = 10;
     this.speed = 2;
     this.height = 30;
     this.width = 30;
@@ -116,6 +116,8 @@ class Zombie{
     this.agitationRange = 120;
     // useful later
     this.enemyDistance = width;
+    this.targetX = width;
+    this.targetY = height;
   }
 
   // displays zombies
@@ -139,6 +141,7 @@ class Zombie{
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
       if(this.enemyDistance < this.range && frameCount%30 === 0){
         target.health -= this.damage;
+        console.log(this.closestTroopIndex);
       }
     }
   }
@@ -153,26 +156,29 @@ class Zombie{
       if(this.enemyDistance < this.agitationRange){
         // sets zombie to attack mode
         this.attackState = "agitated";
-        // targets closest troop if they're bunched up
-        if(this.enemyDistance < this.closestTroop){
-          this.closestTroopIndex = target;
-          this.closestTroop = this.enemyDistance;
-          
-        }
-        else{
-          this.closestTroopIndex = target;
-        }
       }
-      // stops when close to troops
-      // if(this.enemyDistance < this.width){
-      //   this.attackState = "attack";
-      // }
       // resets aggresion once the zombies have killed a troop
       if(theTroops.length - 1 < this.closestTroopIndex){
         this.attackState = "calm";
         this.closestTroopIndex = target;
         this.closestTroop = width;
       }
+    }
+  }
+
+  seeTargets(theTroops){
+    
+    for(let target = theTroops.length - 1; target >= 0; target --){
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      // targets closest troop if they're bunched up
+      // if(this.enemyDistance < this.closestTroop){
+      //   this.closestTroopIndex = target;
+      //   this.closestTroop = this.enemyDistance;
+      // }
+      // try to see if you can get target x and y and then use them to lock on and find the closest target
+
+      console.log(this.closestTroopIndex);
+
     }
   }
   
@@ -245,6 +251,7 @@ function draw() {
       enemy.attackTroops(theTroops);
       enemy.seeTroops(theTroops);
       enemy.move();
+      enemy.seeTargets(theTroops);
       enemy.target(theTroops);
     }
     else{

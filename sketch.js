@@ -143,19 +143,33 @@ class Zombie{
     }
   }
 
-  seeTroops(trooper){
-    if(millis()%5 === 0){
-      for(let target = trooper.length - 1; target > 0; target --){
-        this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-        if(this.enemyDistance < this.closestTroop){
-          this.closestTroop = this.enemyDistance;
-          this.closestTroopIndex = target;
-          console.log(this.closestTroopIndex);
-        }
+  seeTroops(trooper){ 
+
+    // if(frameCount%5 === 0 && trooper.length > 0){
+    //   //for
+    //   this.closestTroop = this.enemyDistance;
+    //   this.closestTroopIndex = 0;
+    // }
+    for(let target = trooper.length - 1; target >= 0; target --){
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      if(this.enemyDistance < this.closestTroop){
+        this.closestTroop = this.enemyDistance;
+        this.closestTroopIndex = target;
+        console.log(this.closestTroop);
       }
-
     }
+  }
 
+  agitation(theTroops){
+    for(let target = theTroops.length - 1; target >= 0; target --){
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      if(this.enemyDistance < this.agitationRange){
+        this.attackState = "agitated";
+      }
+      else{
+        this.attackState = "calm";
+      }
+    }
   }
 
   move(){
@@ -163,11 +177,26 @@ class Zombie{
     if(this.attackState === "calm" && this.x < width){
       this.x += this.speed;
     }
+    // if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+    //   if(theTroops[this.closestTroopIndex].x > this.x){
+    //     this.x += this.speed;
+    //   }
+    //   if(theTroops[this.closestTroopIndex].y > this.y){
+    //     this.y += this.speed;
+    //   }
+    //   if(theTroops[this.closestTroopIndex].y < this.y){
+    //     this.y -= this.speed;
+    //   }
+    //   if(theTroops[this.closestTroopIndex].x < this.x){
+    //     this.x -= this.speed;
+    //   }
+    // }
     // makes sure the enemies are in agitation range
     if (this.enemyDistance > this.agitationRange){
       this.attackState = "calm";
     }
   }
+
 
   // temporary code meant to see what the zombies are targeting
   target(pointsArray){
@@ -212,6 +241,7 @@ function draw() {
       enemy.move();
       enemy.target(theTroops);
       enemy.seeTroops(theTroops);
+      // enemy.agitation(theTroops);
     }
     else{
       enemy.attackState = "stop";
@@ -278,6 +308,12 @@ function spawnEnemies(){
   }
 }
 
+
+function keyPressed(){
+  if(key === "x"){
+    theTroops.splice(0,1);
+  }
+}
 
 
 // // checks to see if troops are close enough to draw attention

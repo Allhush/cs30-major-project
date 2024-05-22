@@ -22,9 +22,12 @@ let dangerScore = 100;
 let roundCounter = 0;
 // used to make sound for sword troop
 let swordSlash;
+// used to make sound for zombies
+let zombieGroan
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
+  zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3")
 }
 
 // most basic troop that the player can buy
@@ -230,6 +233,13 @@ class Zombie{
   }
 
 
+  // makes zombies groan every so often
+  soundEffects(){
+    if(frameCount%(Math.round(random(12, 36)*10)) === 0){
+      zombieGroan.play();
+    }
+  }
+
   // temporary code meant to see what the zombies are targeting
   target(pointsArray){
     for(let otherPoint of pointsArray){
@@ -276,6 +286,8 @@ function draw() {
     enemy.target(theTroops);
     // checks if troops are close enough to cause agitation
     enemy.agitation(theTroops);
+    // makes sound effects
+    enemy.soundEffects();
   }
   // gets rid of dead enemies/troops
   killTheDead();

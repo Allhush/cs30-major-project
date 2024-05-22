@@ -116,6 +116,12 @@ class Zombie{
     this.agitationRange = 120;
     // useful later
     this.enemyDistance = width;
+
+    this.enemyX = width;
+
+    this.enemyY = height;
+
+    this.enemyNumbers = 0;
   }
 
   // displays zombies
@@ -142,21 +148,31 @@ class Zombie{
       }
     }
   }
-
-  seeTroops(trooper){ 
-
-    // if(frameCount%5 === 0 && trooper.length > 0){
-    //   //for
-    //   this.closestTroop = this.enemyDistance;
-    //   this.closestTroopIndex = 0;
-    // }
+  
+  // if(frameCount%5 === 0 && trooper.length > 0){
+  //   //for
+  //   this.closestTroop = this.enemyDistance;
+  //   this.closestTroopIndex = 0;
+  // }
+  seeTroops(trooper){
+    if(trooper.length < this.enemyNumbers){
+      this.enemyX = width;
+      this.enemyY = height;
+    }
     for(let target = trooper.length - 1; target >= 0; target --){
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      if(this.enemyDistance < this.closestTroop){
-        this.closestTroop = this.enemyDistance;
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        this.enemyX = trooper[target].x;
+        this.enemyY = trooper[target].y;
         this.closestTroopIndex = target;
-        console.log(this.closestTroop);
+        console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
       }
+      else{
+        this.enemyNumbers = theTroops.length;
+      }
+      // if(frameCount%30 === 0){
+      //   console.log(this.enemyDistance);
+      // }
     }
   }
 
@@ -166,9 +182,6 @@ class Zombie{
       if(this.enemyDistance < this.agitationRange){
         this.attackState = "agitated";
       }
-      else{
-        this.attackState = "calm";
-      }
     }
   }
 
@@ -177,20 +190,20 @@ class Zombie{
     if(this.attackState === "calm" && this.x < width){
       this.x += this.speed;
     }
-    // if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
-    //   if(theTroops[this.closestTroopIndex].x > this.x){
-    //     this.x += this.speed;
-    //   }
-    //   if(theTroops[this.closestTroopIndex].y > this.y){
-    //     this.y += this.speed;
-    //   }
-    //   if(theTroops[this.closestTroopIndex].y < this.y){
-    //     this.y -= this.speed;
-    //   }
-    //   if(theTroops[this.closestTroopIndex].x < this.x){
-    //     this.x -= this.speed;
-    //   }
-    // }
+    if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+      if(this.enemyX > this.x){
+        this.x += this.speed;
+      }
+      if(this.enemyY > this.y){
+        this.y += this.speed;
+      }
+      if(this.enemyY < this.y){
+        this.y -= this.speed;
+      }
+      if(this.enemyX < this.x){
+        this.x -= this.speed;
+      }
+    }
     // makes sure the enemies are in agitation range
     if (this.enemyDistance > this.agitationRange){
       this.attackState = "calm";
@@ -241,7 +254,7 @@ function draw() {
       enemy.move();
       enemy.target(theTroops);
       enemy.seeTroops(theTroops);
-      // enemy.agitation(theTroops);
+      enemy.agitation(theTroops);
     }
     else{
       enemy.attackState = "stop";

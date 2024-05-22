@@ -12,7 +12,7 @@
 - multiple troop types with different attacks
   - sword troop
     - short range troop that will have higher health
- - Spearman
+  - Spearman
     - longer range than the sword troop, but less effective at close range
 - multiple enemy types with different attacks
   - zombie

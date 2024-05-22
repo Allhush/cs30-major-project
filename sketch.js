@@ -20,6 +20,12 @@ let coins = 100;
 let dangerScore = 100;
 // counts rounds
 let roundCounter = 0;
+// used to make sound for sword troop
+let swordSlash;
+
+function preload(){
+  swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
+}
 
 // most basic troop that the player can buy
 class SwordTroop{
@@ -66,6 +72,7 @@ class SwordTroop{
       // attacks enemies
       if(enemyDistance < this.range && frameCount%15 === 0){
         target.health -= this.damage;
+        swordSlash.play();
       }
     }
   }
@@ -98,7 +105,7 @@ class Zombie{
     // almost identacle to swordTroop definitions, look above to see
     this.x = x;
     this.y = y;
-    this.health = 500000;
+    this.health = 50;
     this.damage = 50;
     this.speed = 2;
     this.height = 30;
@@ -155,19 +162,28 @@ class Zombie{
   //   this.closestTroopIndex = 0;
   // }
   seeTroops(trooper){
+    // checks to see if a troops has been deleted
     if(trooper.length < this.enemyNumbers){
+      // resets targeting for the enemies
       this.enemyX = width;
       this.enemyY = height;
     }
+    // goes through all possible targets
     for(let target = trooper.length - 1; target >= 0; target --){
+      // checks the distance of the current troop in the array
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      // checks if another troop is closer
       if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
         this.enemyX = trooper[target].x;
         this.enemyY = trooper[target].y;
+        // targets the new troops]
         this.closestTroopIndex = target;
+        // test stuff, not important
         console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
       }
       else{
+        // resets circuit to see if another troop is closer
         this.enemyNumbers = theTroops.length;
       }
       // if(frameCount%30 === 0){
@@ -177,8 +193,11 @@ class Zombie{
   }
 
   agitation(theTroops){
+    // goes through all possible targets
     for(let target = theTroops.length - 1; target >= 0; target --){
+      // checks how close the targets
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      // if targets are cloes enough the enemy becomes agitated
       if(this.enemyDistance < this.agitationRange){
         this.attackState = "agitated";
       }
@@ -234,35 +253,29 @@ function draw() {
   // carries out functions needed to control the troops
   // spawnEnemies();
   for(let troops of theTroops){
+    // shows the troops
     troops.display();
+    // lets troops attack enemies
     troops.attackTroops(theEnemies);
+    // lets you move the troops around with your mouse
     troops.mouseMove();
+    // checks to see if you're allowed to move the troops
     troops.mouseMoveSetup();
   }
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
-    
-    // enemy.display();
-    // enemy.attackTroops(theTroops);
-    // enemy.seeTroops(theTroops);
-    // enemy.move();
-    // enemy.target(theTroops);
-    // meant to test responses to certatin situations, key needs to be pressed to carry out functions
-    if(keyIsDown(65)){
-      enemy.display();
-      enemy.attackTroops(theTroops);
-      enemy.move();
-      enemy.target(theTroops);
-      enemy.seeTroops(theTroops);
-      enemy.agitation(theTroops);
-    }
-    else{
-      enemy.attackState = "stop";
-    }
-    if(theTroops.length === 0){
-      enemy.attackState = "calm";
-    }
-    // console.log(enemy.health);
+    // shows the enemy
+    enemy.display();
+    // lets the enemies attack the troops
+    enemy.attackTroops(theTroops);
+    // targets the troops for the enemies
+    enemy.seeTroops(theTroops);
+    // moves troops
+    enemy.move();
+    // shows what troops the enemy is looking at, will remove later
+    enemy.target(theTroops);
+    // checks if troops are close enough to cause agitation
+    enemy.agitation(theTroops);
   }
   // gets rid of dead enemies/troops
   killTheDead();
@@ -327,32 +340,3 @@ function keyPressed(){
     theTroops.splice(0,1);
   }
 }
-
-
-// // checks to see if troops are close enough to draw attention
-// seeTroops(trooper){
-//   // examines all of the troops
-//   for(let target = trooper.length - 1; target >= 0; target --){
-//     // checks to see how close the enemies are
-//     this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-//     // checks to see if the troops are close to draw attention
-//     if(this.enemyDistance < this.agitationRange){
-//       // sets zombie to attack mode
-//       this.attackState = "agitated";
-//     }
-//     // resets aggresion once the zombies have killed a troop
-//     if(theTroops.length - 1 < this.closestTroopIndex){
-//       this.attackState = "calm";
-//       this.closestTroop = width;
-//     }
-//   }
-// }
-
-// seeTargets(theTroops){
-//   for(let target = theTroops.length - 1; target >= 0; target --){
-//     this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      
-      
-//   }
-// }
-  

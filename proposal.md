@@ -25,7 +25,7 @@
 - at least 1 boss monster
 - ability to move troops to desired areas
   - select troops and move them to a certain areas 
-  - place troops where you want pn screen
+  - place troops where you want on screen
 - sound effects
   - sword slash
   - spear clank

@@ -23,11 +23,13 @@ let roundCounter = 0;
 // used to make sound for sword troop
 let swordSlash;
 // used to make sound for zombies
-let zombieGroan
+let zombieGroan;
+
+let doubleCheck = "no";
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
-  zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3")
+  zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
 }
 
 // most basic troop that the player can buy
@@ -40,7 +42,7 @@ class SwordTroop{
     // troops health
     this.health = 200;
     // troops damage
-    this.damage = 10;
+    this.damage = 20;
     // troops height
     this.height = 30;
     // troops width
@@ -75,6 +77,7 @@ class SwordTroop{
       // attacks enemies
       if(enemyDistance < this.range && frameCount%15 === 0){
         target.health -= this.damage;
+        // plays sound effect
         swordSlash.play();
       }
     }
@@ -84,9 +87,11 @@ class SwordTroop{
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
     if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
+      // moves the troop around
       this.liftState = true;
     }
     else{
+      // doesn't move your troops around
       this.liftState = false;
     }
   }
@@ -94,8 +99,11 @@ class SwordTroop{
   // moves troops
   mouseMove(){
     if(this.liftState){
+      // makes troop track the mouse
       this.x = mouseX;
       this.y = mouseY;
+      // turns on the double check function so that the enemies can ajust to new values
+      doubleCheck = "yes";
     }
   }
 
@@ -109,8 +117,8 @@ class Zombie{
     this.x = x;
     this.y = y;
     this.health = 50;
-    this.damage = 50;
-    this.speed = 2;
+    this.damage = 15;
+    this.speed = 1;
     this.height = 30;
     this.width = 30;
     this.colour = "green";
@@ -123,7 +131,7 @@ class Zombie{
     // useful later
     this.closestTroopIndex = 0;
     // how close an enemy needs to be to attarct enemy attention
-    this.agitationRange = 120;
+    this.agitationRange = 80;
     // useful later
     this.enemyDistance = width;
 
@@ -205,6 +213,22 @@ class Zombie{
         this.attackState = "agitated";
       }
     }
+    if(this.closestTroopIndex > theTroops.length - 1){
+      this.attackState = "calm";
+    }
+  }
+
+  // checks values when player moves troops around
+  doubleCheckMouseLift(){
+    // checks if player is lifting troops
+    if(doubleCheck === "yes"){
+      // resets values
+      this.enemyX = width;
+      this.enemyY = height;
+      this.enemyDistance = width;
+      // turns off double check function
+      doubleCheck = "no";
+    }
   }
 
   move(){
@@ -235,7 +259,8 @@ class Zombie{
 
   // makes zombies groan every so often
   soundEffects(){
-    if(frameCount%(Math.round(random(12, 36)*10)) === 0){
+    if(frameCount%Math.round(random(12, 36)*10) === 0){
+      // plays sound effect
       zombieGroan.play();
     }
   }
@@ -288,6 +313,8 @@ function draw() {
     enemy.agitation(theTroops);
     // makes sound effects
     enemy.soundEffects();
+    // resets values in case the player moves their troops around
+    enemy.doubleCheckMouseLift();
   }
   // gets rid of dead enemies/troops
   killTheDead();
@@ -320,6 +347,7 @@ function mousePressed(){
   if(keyIsDown(90)){
     let someTroop = new SwordTroop(mouseX, mouseY);
     theTroops.push(someTroop);
+    coins -= SWORDCOST;
   }
   // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
   if(keyIsDown(67)){
@@ -335,7 +363,7 @@ function spawnEnemies(){
   if(theEnemies.length < 1){
     // adds enemies based on the danger score
     for(let q = dangerScore; q > 0; q -= ZOMBIEDANGER){
-      let someEnemy = new Zombie(30 + random(-10, 10), random(30, height - 30));
+      let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
       theEnemies.push(someEnemy);
     }
     // increases danger score for next round

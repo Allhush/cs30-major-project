@@ -24,8 +24,10 @@ let roundCounter = 0;
 let swordSlash;
 // used to make sound for zombies
 let zombieGroan;
-
+// helps with targeting for the enemies
 let doubleCheck = "no";
+// makes sure that double check has enough time to reset the targeting
+let doubleCheckHelper = 0;
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
@@ -55,6 +57,8 @@ class SwordTroop{
     this.range = 50;
     // checks if the player is moving the troop
     this.liftState = false;
+    // small delay used in some functions
+    this.delay = 100;
   }
 
   // displays the troop
@@ -104,6 +108,8 @@ class SwordTroop{
       this.y = mouseY;
       // turns on the double check function so that the enemies can ajust to new values
       doubleCheck = "yes";
+      // adds in delay for double check so that it always has enough time to verify targets
+      doubleCheckHelper = millis() + this.delay;
     }
   }
 
@@ -122,23 +128,24 @@ class Zombie{
     this.height = 30;
     this.width = 30;
     this.colour = "green";
+    // how many coins the zombie gives on death
     this.coin = 5;
     this.range = 20;
     // decideds if there are troops close enough to attack
     this.attackState = "calm";
-    // useful later
+    // dead code
     this.closestTroop = width;
-    // useful later
+    // saves the ndex of the closest troop so that it can be tracked
     this.closestTroopIndex = 0;
     // how close an enemy needs to be to attarct enemy attention
     this.agitationRange = 80;
-    // useful later
+    // sees how close the eneimes are
     this.enemyDistance = width;
-
+    // used in targeting to see enemies x coordinate
     this.enemyX = width;
-
+    // used in targeting to see enemies y coordinate
     this.enemyY = height;
-
+    // makes sure the enemies is a valid target
     this.enemyNumbers = 0;
   }
 
@@ -227,7 +234,9 @@ class Zombie{
       this.enemyY = height;
       this.enemyDistance = width;
       // turns off double check function
-      doubleCheck = "no";
+      if(millis() > doubleCheckHelper){
+        doubleCheck = "no";
+      }
     }
   }
 

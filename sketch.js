@@ -9,6 +9,8 @@
 const SWORDCOST = 20;
 // zombie danger value
 const ZOMBIEDANGER = 10;
+// cost of a spear troop
+const SPEARCOST = 30;
 
 // holds all of the troops bought by the player
 let theTroops = [];
@@ -42,7 +44,7 @@ class SwordTroop{
     // troops y value
     this.y = y;
     // troops health
-    this.health = 200;
+    this.health = 75;
     // troops damage
     this.damage = 20;
     // troops height
@@ -59,6 +61,7 @@ class SwordTroop{
     this.liftState = false;
     // small delay used in some functions
     this.delay = 100;
+    this.space = 15;
   }
 
   // displays the troop
@@ -79,7 +82,7 @@ class SwordTroop{
       // checks range
       let enemyDistance = dist(this.x, this.y, target.x, target.y);
       // attacks enemies
-      if(enemyDistance < this.range && frameCount%15 === 0){
+      if(enemyDistance < this.range && frameCount%60 === 0){
         target.health -= this.damage;
         // plays sound effect
         swordSlash.play();
@@ -112,6 +115,118 @@ class SwordTroop{
       doubleCheckHelper = millis() + this.delay;
     }
   }
+
+  // not working right now, will come back and fix it later, maybe, potentially
+  // spaceOut(trooper){
+  //   for(let i = trooper.length - 1; i >= 0; i--){
+  //     if(this !== trooper[i] && trooper.length > 1){
+  //       if(trooper[i].x - this.x < this.space){
+  //         trooper[i].x += this.space;
+  //       }
+  //     }
+  //   }
+  // }
+
+}
+
+class SpearMan{
+  constructor(x,y){
+    // troops x value
+    this.x = x;
+    // troops y value
+    this.y = y;
+    // troops health
+    this.health = 50;
+    // troops damage beyond a range of 25
+    this.damage25Plus = 40;
+    // troops damage less than a range of 25
+    this.damge25Minus = 5;
+    // troops height
+    this.height = 30;
+    // troops width
+    this.width = 30;
+    // troops coin cost
+    this.cost = SPEARCOST;
+    // temporary color for the sword troop
+    this.colour = "blue";
+    // range the spear troop can attack from
+    this.range1 = 75;
+    // range spear troops are less effective at
+    this.range2 = 25;
+    // checks if the player is moving the troop
+    this.liftState = false;
+    // small delay used in some functions
+    this.delay = 100;
+    this.space = 15;
+  }
+
+  // displays the troop
+  display(){
+    noStroke();
+    // centers troop
+    rectMode(CENTER);
+    // sets troops temporary color
+    fill(this.colour);
+    // places troop at correct position with correct height and length
+    rect(this.x, this.y, this.width, this.height);
+  }
+
+  // lets troops attack enemies
+  attackTroops(theEnemies){
+    // goes through all the enemies
+    for(let target of theEnemies){
+      // checks range
+      let enemyDistance = dist(this.x, this.y, target.x, target.y);
+      // attacks enemies
+      if(enemyDistance < this.range1 && enemyDistance > this.range2 && frameCount%60 === 0){
+        target.health -= 40;
+        // plays sound effect
+        swordSlash.play();
+      }
+      else if(enemyDistance <= this.range2 && frameCount%60 === 0){
+        target.health -= 5;
+        // plays sound effect
+        swordSlash.play();
+      }
+    }
+  }
+
+  // checks if the player is trying to move the troops
+  mouseMoveSetup(){
+    // checks values to see if the player is trying to move
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
+      // moves the troop around
+      this.liftState = true;
+    }
+    else{
+      // doesn't move your troops around
+      this.liftState = false;
+    }
+  }
+
+  // moves troops
+  mouseMove(){
+    if(this.liftState){
+      // makes troop track the mouse
+      this.x = mouseX;
+      this.y = mouseY;
+      // turns on the double check function so that the enemies can ajust to new values
+      doubleCheck = "yes";
+      // adds in delay for double check so that it always has enough time to verify targets
+      doubleCheckHelper = millis() + this.delay;
+    }
+  }
+
+  // not working right now, will come back and fix it later, maybe, potentially
+  // spaceOut(trooper){
+  //   for(let i = trooper.length - 1; i >= 0; i--){
+  //     if(this !== trooper[i] && trooper.length > 1){
+  //       if(trooper[i].x - this.x < this.space){
+  //         trooper[i].x += this.space;
+  //       }
+  //     }
+  //   }
+  // }
 
 }
 
@@ -168,7 +283,7 @@ class Zombie{
   attackTroops(theTroops){
     for(let target of theTroops){
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(this.enemyDistance < this.range && frameCount%30 === 0){
+      if(this.enemyDistance < this.range && frameCount%60 === 0){
         target.health -= this.damage;
       }
     }
@@ -305,6 +420,8 @@ function draw() {
     troops.mouseMove();
     // checks to see if you're allowed to move the troops
     troops.mouseMoveSetup();
+    // currently out of order
+    // // troops.spaceOut(theTroops);
   }
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
@@ -357,6 +474,11 @@ function mousePressed(){
     let someTroop = new SwordTroop(mouseX, mouseY);
     theTroops.push(someTroop);
     coins -= SWORDCOST;
+  }
+  if(keyIsDown(68)){
+    let someTroop = new SpearMan(mouseX, mouseY);
+    theTroops.push(someTroop);
+    coins -= SPEARCOST;
   }
   // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
   if(keyIsDown(67)){

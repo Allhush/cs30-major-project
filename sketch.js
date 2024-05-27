@@ -39,6 +39,8 @@ function preload(){
 // most basic troop that the player can buy
 class SwordTroop{
   constructor(x,y){
+    // identifys troop to see if certain functions apply
+    this.identify = "sword";
     // troops x value
     this.x = x;
     // troops y value
@@ -131,6 +133,8 @@ class SwordTroop{
 
 class SpearMan{
   constructor(x,y){
+    // identifys troop to see if certain functions apply
+    this.identify = "spear";
     // troops x value
     this.x = x;
     // troops y value
@@ -158,6 +162,12 @@ class SpearMan{
     // small delay used in some functions
     this.delay = 100;
     this.space = 15;
+    // all of these are used to identify the closest troop so it can't one shot everything
+    this.enemyX = width;
+    this.enemyY = height;
+    this.enemyDistance;
+    this.closestTroopIndex = -1;
+    this.enemyNumbers = 0;
   }
 
   // displays the troop
@@ -173,20 +183,56 @@ class SpearMan{
 
   // lets troops attack enemies
   attackTroops(theEnemies){
-    // goes through all the enemies
-    for(let target of theEnemies){
-      // checks range
-      let enemyDistance = dist(this.x, this.y, target.x, target.y);
-      // attacks enemies
-      if(enemyDistance < this.range1 && enemyDistance > this.range2 && frameCount%60 === 0){
-        target.health -= 40;
-        // plays sound effect
-        swordSlash.play();
+    // if(theEnemies.length < this.enemyNumbers){
+    //   // resets targeting for the enemies
+    //   this.enemyX = width;
+    //   this.enemyY = height;
+    // }
+    // attacks enemies
+    if(dist(this.x, this.y, this.enemyX, this.enemyY) < this.range1 && dist(this.x, this.y, this.enemyX, this.enemyY) > this.range2 && frameCount%60 === 0){
+      theEnemies[this.closestTroopIndex].health -= 50;
+      // plays sound effect
+      swordSlash.play();
+      console.log("damaging");
+      
+    }
+    else if(dist(this.x, this.y, this.enemyX, this.enemyY) <= this.range2 && frameCount%60 === 0){
+      theEnemies[this.closestTroopIndex].health -= 5;
+      // plays sound effect
+      swordSlash.play();
+      console.log("damaging2");
+      
+    }
+    // for(let target = theEnemies.length - 1; target >= 0; target --){
+      
+    //   else{
+    //     // resets circuit to see if another troop is closer
+    //     this.enemyNumbers = theTroops.length;
+    //   }
+    // }
+  }
+
+  targeting(trooper){
+    if(trooper.length < this.enemyNumbers){
+      // resets targeting for the enemies
+      this.enemyX = width;
+      this.enemyY = height;
+    }
+    for(let target = trooper.length - 1; target >= 0; target --){
+      // checks the distance of the current troop in the array
+      this.enemyDistance = dist(this.x, this.y, theEnemies[target].x, theEnemies[target].y);
+      // checks if another troop is closer
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
+        this.enemyX = trooper[target].x;
+        this.enemyY = trooper[target].y;
+        // targets the new troops]
+        this.closestTroopIndex = target;
+        // test stuff, not important
       }
-      else if(enemyDistance <= this.range2 && frameCount%60 === 0){
-        target.health -= 5;
-        // plays sound effect
-        swordSlash.play();
+      else{
+        // resets circuit to see if another troop is closer
+        this.enemyNumbers = theTroops.length;
       }
     }
   }
@@ -216,17 +262,6 @@ class SpearMan{
       doubleCheckHelper = millis() + this.delay;
     }
   }
-
-  // not working right now, will come back and fix it later, maybe, potentially
-  // spaceOut(trooper){
-  //   for(let i = trooper.length - 1; i >= 0; i--){
-  //     if(this !== trooper[i] && trooper.length > 1){
-  //       if(trooper[i].x - this.x < this.space){
-  //         trooper[i].x += this.space;
-  //       }
-  //     }
-  //   }
-  // }
 
 }
 
@@ -420,6 +455,9 @@ function draw() {
     troops.mouseMove();
     // checks to see if you're allowed to move the troops
     troops.mouseMoveSetup();
+    if(troops.identify === "spear"){
+      troops.targeting(theEnemies);
+    }
     // currently out of order
     // // troops.spaceOut(theTroops);
   }

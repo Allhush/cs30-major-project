@@ -92,16 +92,20 @@ class SwordTroop{
     }
   }
 
+
   // checks if the player is trying to move the troops
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
-    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
+    if(mouseIsPressed && this.liftState === 1){
+      // doesn't move your troops around
+      this.liftState = 2;
+    }
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && !keyIsDown(90) && this.liftState === 1){
       // moves the troop around
-      this.liftState = true;
+      this.liftState = 0;
     }
     else{
-      // doesn't move your troops around
-      this.liftState = false;
+      this.liftState = 1;
     }
   }
 
@@ -183,25 +187,49 @@ class SpearMan{
 
   // lets troops attack enemies
   attackTroops(theEnemies){
+    
+    if(theEnemies.length < this.enemyNumbers){
+      // resets targeting for the enemies
+      this.enemyX = width;
+      this.enemyY = height;
+    }
+    for(let target = theEnemies.length - 1; target >= 0; target --){
+      // checks the distance of the current troop in the array
+      this.enemyDistance = dist(this.x, this.y, theEnemies[target].x, theEnemies[target].y);
+      // checks if another troop is closer
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
+        this.enemyX = theEnemies[target].x;
+        this.enemyY = theEnemies[target].y;
+        // targets the new troops]
+        this.closestTroopIndex = target;
+        // console.log(this.closestTroopIndex);
+      }
+      else{
+        // resets circuit to see if another troop is closer
+        this.enemyNumbers = theTroops.length;
+      }
+    }
+    
     // if(theEnemies.length < this.enemyNumbers){
     //   // resets targeting for the enemies
     //   this.enemyX = width;
     //   this.enemyY = height;
     // }
     // attacks enemies
-    if(dist(this.x, this.y, this.enemyX, this.enemyY) < this.range1 && dist(this.x, this.y, this.enemyX, this.enemyY) > this.range2 && frameCount%60 === 0){
+    let enemyDistance = dist(this.x, this.y, this.enemyX, this.enemyY);
+    if(enemyDistance < this.range1 && enemyDistance > this.range2 && frameCount%60 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
       theEnemies[this.closestTroopIndex].health -= 50;
       // plays sound effect
       swordSlash.play();
-      console.log("damaging");
-      
+      // console.log("damaging");
+      this.closestTroopIndex = -1;
     }
-    else if(dist(this.x, this.y, this.enemyX, this.enemyY) <= this.range2 && frameCount%60 === 0){
+    else if(enemyDistance <= this.range2 && frameCount%60 === 0 && this.closestTroopIndex < theEnemies.length){
       theEnemies[this.closestTroopIndex].health -= 5;
       // plays sound effect
       swordSlash.play();
-      console.log("damaging2");
-      
+      // console.log("damaging2");
     }
     // for(let target = theEnemies.length - 1; target >= 0; target --){
       
@@ -212,47 +240,25 @@ class SpearMan{
     // }
   }
 
-  targeting(trooper){
-    if(trooper.length < this.enemyNumbers){
-      // resets targeting for the enemies
-      this.enemyX = width;
-      this.enemyY = height;
-    }
-    for(let target = trooper.length - 1; target >= 0; target --){
-      // checks the distance of the current troop in the array
-      this.enemyDistance = dist(this.x, this.y, theEnemies[target].x, theEnemies[target].y);
-      // checks if another troop is closer
-      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
-        // resets target if it is closer
-        this.enemyX = trooper[target].x;
-        this.enemyY = trooper[target].y;
-        // targets the new troops]
-        this.closestTroopIndex = target;
-        // test stuff, not important
-      }
-      else{
-        // resets circuit to see if another troop is closer
-        this.enemyNumbers = theTroops.length;
-      }
-    }
-  }
-
   // checks if the player is trying to move the troops
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
-    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
+    if(mouseIsPressed && this.liftState === 1){
+      // doesn't move your troops around
+      this.liftState = 2;
+    }
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false && this.liftState === 1){
       // moves the troop around
-      this.liftState = true;
+      this.liftState = 0;
     }
     else{
-      // doesn't move your troops around
-      this.liftState = false;
+      this.liftState = 1;
     }
   }
 
   // moves troops
   mouseMove(){
-    if(this.liftState){
+    if(this.liftState === 0){
       // makes troop track the mouse
       this.x = mouseX;
       this.y = mouseY;
@@ -348,7 +354,7 @@ class Zombie{
         // targets the new troops]
         this.closestTroopIndex = target;
         // test stuff, not important
-        console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
+        // console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
       }
       else{
         // resets circuit to see if another troop is closer
@@ -446,6 +452,7 @@ function draw() {
   background(220);
   // carries out functions needed to control the troops
   // spawnEnemies();
+  buyTroops();
   for(let troops of theTroops){
     // shows the troops
     troops.display();
@@ -455,9 +462,6 @@ function draw() {
     troops.mouseMove();
     // checks to see if you're allowed to move the troops
     troops.mouseMoveSetup();
-    if(troops.identify === "spear"){
-      troops.targeting(theEnemies);
-    }
     // currently out of order
     // // troops.spaceOut(theTroops);
   }
@@ -548,4 +552,11 @@ function keyPressed(){
   if(key === "x"){
     theTroops.splice(0,1);
   }
+}
+
+function buyTroops(){
+  rectMode(CENTER);
+  fill("red");
+  rect(width - width/10, 0 + height/8, width/24, height/12);
+  rect(width - (width/12 - width/ 46), 0 + height/8, width/24, height/12);
 }

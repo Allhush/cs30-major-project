@@ -31,6 +31,8 @@ let doubleCheck = "no";
 // makes sure that double check has enough time to reset the targeting
 let doubleCheckHelper = 0;
 
+let lifted = false;
+
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
   zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
@@ -93,19 +95,17 @@ class SwordTroop{
   }
 
 
-  // checks if the player is trying to move the troops
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
-    if(mouseIsPressed && this.liftState === 1){
-      // doesn't move your troops around
-      this.liftState = 2;
-    }
-    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && !keyIsDown(90) && this.liftState === 1){
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
       // moves the troop around
-      this.liftState = 0;
+      this.liftState = true;
+      lifted = true;
     }
     else{
-      this.liftState = 1;
+      // doesn't move your troops around
+      this.liftState = false;
+      lifted = false;
     }
   }
 
@@ -115,23 +115,19 @@ class SwordTroop{
       // makes troop track the mouse
       this.x = mouseX;
       this.y = mouseY;
-      // turns on the double check function so that the enemies can ajust to new values
-      doubleCheck = "yes";
-      // adds in delay for double check so that it always has enough time to verify targets
-      doubleCheckHelper = millis() + this.delay;
+
     }
   }
 
-  // not working right now, will come back and fix it later, maybe, potentially
-  // spaceOut(trooper){
-  //   for(let i = trooper.length - 1; i >= 0; i--){
-  //     if(this !== trooper[i] && trooper.length > 1){
-  //       if(trooper[i].x - this.x < this.space){
-  //         trooper[i].x += this.space;
-  //       }
-  //     }
-  //   }
-  // }
+  spaceOut(trooper){
+    for(let i = trooper.length - 1; i >= 0; i--){
+      if(this !== trooper[i] && trooper.length > 1 && lifted){
+        if(trooper[i].x - this.x < this.space){
+          trooper[i].x += this.space;
+        }
+      }
+    }
+  }
 
 }
 
@@ -231,44 +227,32 @@ class SpearMan{
       swordSlash.play();
       // console.log("damaging2");
     }
-    // for(let target = theEnemies.length - 1; target >= 0; target --){
-      
-    //   else{
-    //     // resets circuit to see if another troop is closer
-    //     this.enemyNumbers = theTroops.length;
-    //   }
-    // }
   }
 
   // checks if the player is trying to move the troops
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
-    if(mouseIsPressed && this.liftState === 1){
-      // doesn't move your troops around
-      this.liftState = 2;
-    }
-    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false && this.liftState === 1){
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(68) === false){
       // moves the troop around
-      this.liftState = 0;
+      this.liftState = true;
+      lifted = true;
     }
     else{
-      this.liftState = 1;
+      // doesn't move your troops around
+      this.liftState = false;
+      lifted = false;
     }
   }
 
   // moves troops
   mouseMove(){
-    if(this.liftState === 0){
+    if(this.liftState){
       // makes troop track the mouse
       this.x = mouseX;
       this.y = mouseY;
-      // turns on the double check function so that the enemies can ajust to new values
-      doubleCheck = "yes";
-      // adds in delay for double check so that it always has enough time to verify targets
-      doubleCheckHelper = millis() + this.delay;
+
     }
   }
-
 }
 
 
@@ -463,7 +447,7 @@ function draw() {
     // checks to see if you're allowed to move the troops
     troops.mouseMoveSetup();
     // currently out of order
-    // // troops.spaceOut(theTroops);
+    troops.spaceOut(theTroops);
   }
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){

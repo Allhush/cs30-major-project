@@ -17,7 +17,7 @@ let theTroops = [];
 // hold all of the enemies that spawn
 let theEnemies = [];
 // holds the coins the player uses to buy troops
-let coins = 100;
+let coins = 500;
 // danger value of the wave of the wave 
 let dangerScore = 100;
 // counts rounds
@@ -489,7 +489,7 @@ function setup() {
 function draw() {
   background(220);
   // carries out functions needed to control the troops
-  // spawnEnemies();
+  spawnEnemies();
   buyTroops();
   for(let troops of theTroops){
     // shows the troops
@@ -550,15 +550,17 @@ function killTheDead(){
 
 function mousePressed(){
   // spawns troops
-  if(keyIsDown(90)){
-    let someTroop = new SwordTroop(mouseX, mouseY);
-    theTroops.push(someTroop);
-    coins -= SWORDCOST;
-  }
-  if(keyIsDown(68)){
-    let someTroop = new SpearMan(mouseX, mouseY);
-    theTroops.push(someTroop);
-    coins -= SPEARCOST;
+  if(coins > 0){
+    if(keyIsDown(90)){
+      let someTroop = new SwordTroop(mouseX, mouseY);
+      theTroops.push(someTroop);
+      coins -= SWORDCOST;
+    }
+    if(keyIsDown(68)){
+      let someTroop = new SpearMan(mouseX, mouseY);
+      theTroops.push(someTroop);
+      coins -= SPEARCOST;
+    }
   }
   // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
   if(keyIsDown(67)){
@@ -594,9 +596,7 @@ function keyPressed(){
 }
 
 function buyTroops(){
-  rectMode(CENTER);
-  fill("red");
-  // buttons to buy troops
-  rect(width - width/8, 0 + height/8, width/24, height/12);
-  rect(width - (width/12 - width/ 46), 0 + height/8, width/24, height/12);
+  fill("black");
+  textAlign(CENTER, CENTER);
+  text("You have " + coins +" coins", 200, 200);
 }

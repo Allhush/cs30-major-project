@@ -100,6 +100,8 @@ class SwordTroop{
     if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(90) === false){
       // moves the troop around
       this.liftState = true;
+      doubleCheck = "yes";
+      doubleCheckHelper = millis() + this.delay;
       lifted = true;
     }
     else{
@@ -119,11 +121,30 @@ class SwordTroop{
     }
   }
 
+  // makes sure you can't stack troops on top of one another
   spaceOut(trooper){
+    // goes through all the troops
     for(let i = trooper.length - 1; i >= 0; i--){
+      // makes sure the troop cannot target itself
       if(this !== trooper[i] && trooper.length > 1 && lifted){
-        if(trooper[i].x - this.x < this.space){
-          trooper[i].x += this.space;
+        // checks the distance of the troops
+        if(dist(this.x, this.y, trooper[i].x, trooper[i].y) - 15 < this.space){
+          // moves troops away if they are too close
+          if(this.x - trooper[i].x < this.space){
+            trooper[i].x += this.space;
+          }
+          if(this.x - trooper[i].x > this.space){
+            trooper[i].x -= this.space;
+          }
+          if(this.y - trooper[i].y < this.space){
+            trooper[i].y += this.space;
+          }
+          if(this.y - trooper[i].y > this.space){
+            trooper[i].y -= this.space;
+          }
+          if(this.x === trooper[i].x){
+            trooper[i].x += this.space;
+          }
         }
       }
     }
@@ -235,6 +256,8 @@ class SpearMan{
     if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(68) === false){
       // moves the troop around
       this.liftState = true;
+      doubleCheck = "yes";
+      doubleCheckHelper = millis() + this.delay;
       lifted = true;
     }
     else{
@@ -253,7 +276,38 @@ class SpearMan{
 
     }
   }
+
+  // makes sure you can't stack troops on top of one another
+  spaceOut(trooper){
+    // goes through all the troops
+    for(let i = trooper.length - 1; i >= 0; i--){
+      // makes sure the troop cannot target itself
+      if(this !== trooper[i] && trooper.length > 1 && lifted){
+        // checks the distance of the troops
+        if(dist(this.x, this.y, trooper[i].x, trooper[i].y) - 15 < this.space){
+          // moves troops away if they are too close
+          if(this.x - trooper[i].x < this.space){
+            trooper[i].x += this.space;
+          }
+          if(this.x - trooper[i].x > this.space){
+            trooper[i].x -= this.space;
+          }
+          if(this.y - trooper[i].y < this.space){
+            trooper[i].y += this.space;
+          }
+          if(this.y - trooper[i].y > this.space){
+            trooper[i].y -= this.space;
+          }
+          if(this.x === trooper[i].x){
+            trooper[i].x += this.space;
+          }
+        }
+      }
+    }
+  }
+  
 }
+
 
 
 // simplest enemy
@@ -533,14 +587,16 @@ function spawnEnemies(){
 
 
 function keyPressed(){
-  if(key === "x"){
-    theTroops.splice(0,1);
-  }
+  // was meant for testing, is no longer useful, will remove later
+  // if(key === "x"){
+  //   theTroops.splice(0,1);
+  // }
 }
 
 function buyTroops(){
   rectMode(CENTER);
   fill("red");
-  rect(width - width/10, 0 + height/8, width/24, height/12);
+  // buttons to buy troops
+  rect(width - width/8, 0 + height/8, width/24, height/12);
   rect(width - (width/12 - width/ 46), 0 + height/8, width/24, height/12);
 }

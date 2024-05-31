@@ -462,7 +462,7 @@ class Zombie{
 
   // makes zombies groan every so often
   soundEffects(){
-    if(frameCount%Math.round(random(12, 36)*10) === 0){
+    if(frameCount%Math.round(random(60, 120)*10) === 0){
       // plays sound effect
       zombieGroan.play();
     }
@@ -550,12 +550,14 @@ function killTheDead(){
 
 function mousePressed(){
   // spawns troops
-  if(coins > 0){
+  if(coins >= 20){
     if(keyIsDown(90)){
       let someTroop = new SwordTroop(mouseX, mouseY);
       theTroops.push(someTroop);
       coins -= SWORDCOST;
     }
+  }
+  if(coins >= 30){
     if(keyIsDown(68)){
       let someTroop = new SpearMan(mouseX, mouseY);
       theTroops.push(someTroop);

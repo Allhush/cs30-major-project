@@ -31,6 +31,8 @@ let doubleCheck = "no";
 // makes sure that double check has enough time to reset the targeting
 let doubleCheckHelper = 0;
 
+let gameState = "start";
+
 let lifted = false;
 
 function preload(){
@@ -674,42 +676,55 @@ function setup() {
 
 function draw() {
   background(220);
+  pause();
   // carries out functions needed to control the troops
   // spawnEnemies();
-  buyTroops();
   for(let troops of theTroops){
-    // shows the troops
-    troops.display();
-    // lets troops attack enemies
-    troops.attackTroops(theEnemies);
-    // lets you move the troops around with your mouse
-    troops.mouseMove();
-    // checks to see if you're allowed to move the troops
-    troops.mouseMoveSetup();
-    // currently out of order
-    troops.spaceOut(theTroops);
+    if(gameState === "pause" || gameState === "go"){
+      // shows the troops
+      troops.display();
+    }
+    if(gameState === "go"){
+      // lets troops attack enemies
+      troops.attackTroops(theEnemies);
+      // lets you move the troops around with your mouse
+      troops.mouseMove();
+      // checks to see if you're allowed to move the troops
+      troops.mouseMoveSetup();
+      // currently out of order
+      troops.spaceOut(theTroops);
+    }
   }
   // carries out functions needed to control the enemies
   for(let enemy of theEnemies){
-    // shows the enemy
-    enemy.display();
-    // lets the enemies attack the troops
-    enemy.attackTroops(theTroops);
-    // targets the troops for the enemies
-    enemy.seeTroops(theTroops);
-    // moves troops
-    enemy.move();
-    // shows what troops the enemy is looking at, will remove later
-    enemy.target(theTroops);
-    // checks if troops are close enough to cause agitation
-    enemy.agitation(theTroops);
-    // makes sound effects
-    enemy.soundEffects();
-    // resets values in case the player moves their troops around
-    enemy.doubleCheckMouseLift();
+    if(gameState === "pause" || gameState === "go"){
+      // shows the enemy
+      enemy.display();
+    }
+    if(gameState === "go"){
+      // lets the enemies attack the troops
+      enemy.attackTroops(theTroops);
+      // targets the troops for the enemies
+      enemy.seeTroops(theTroops);
+      // moves troops
+      enemy.move();
+      // shows what troops the enemy is looking at, will remove later
+      enemy.target(theTroops);
+      // checks if troops are close enough to cause agitation
+      enemy.agitation(theTroops);
+      // makes sound effects
+      enemy.soundEffects();
+      // resets values in case the player moves their troops around
+      enemy.doubleCheckMouseLift();
+    }
   }
-  // gets rid of dead enemies/troops
-  killTheDead();
+  if(gameState === "pause" || gameState === "go"){
+    // lets you buy troops
+    buyTroops();
+    // gets rid of dead enemies/troops
+    killTheDead();
+  }
+
 }
 
 // gets rid of dead troops/enemies
@@ -793,4 +808,38 @@ function buyTroops(){
   textAlign(CENTER, CENTER);
   textSize(20);
   text("You have " + coins +" coins", width/2, height/30);
+}
+
+function pause(){
+  if(keyIsDown(80) && gameState === "go" && frameCount%5 === 0){
+    gameState = "pause";
+  }
+  else if(keyIsDown(80) && gameState === "pause" && frameCount%5 === 0){
+    gameState = "go";
+  }
+  if(gameState === "pause"){
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    fill(0);
+    text("Controls", width/2, height/2);
+    textSize(15);
+    text("Press the mouse and Z to spawn a sword troop, press the mouse and D to spawn a spear troop", width/2, height/2 + height/10);
+    text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
+    text("press P to unpause", width/2, height/2 + height/5);
+  }
+  if(gameState === "go"){
+    textAlign(LEFT, CENTER);
+    textSize(20);
+    fill(0);
+    text("Press P to pause the game and see the controls", 0, height/30);
+  }
+  if(gameState === "start" && keyIsDown(71)){
+    gameState = "go";
+  }
+  if(gameState === "start"){
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    fill(0);
+    text("press G to start", width/2, height/2);
+  }
 }

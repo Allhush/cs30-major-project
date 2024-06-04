@@ -35,6 +35,8 @@ let gameState = "start";
 
 let lifted = false;
 
+let q = 0;
+
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
   zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
@@ -559,16 +561,16 @@ class Skeleton{
       // checks the distance of the current troop in the array
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
       if(this.attackState === "agitated" && this.spearCheck){
-        if(this.enemyDistance < this.agitationRange && trooper[target].identify === "spear"){
-          // resets target if it is higher priority
-          this.enemyX = trooper[target].x;
-          this.enemyY = trooper[target].y;
-          // targets the new troops]
-          this.closestTroopIndex = target;
-          console.log("special case");
-        }
+        // if(this.enemyDistance < this.agitationRange && trooper[target].identify === "spear"){
+        //   // resets target if it is higher priority
+        //   this.enemyX = trooper[target].x;
+        //   this.enemyY = trooper[target].y;
+        //   // targets the new troops]
+        //   this.closestTroopIndex = target;
+        //   console.log("special case");
+        // }
         // checks if another troop is closer
-        else if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
           // resets target if it is closer
           this.enemyX = trooper[target].x;
           this.enemyY = trooper[target].y;
@@ -670,6 +672,174 @@ class Skeleton{
 
 }
 
+class BossMonster{
+  constructor(x,y){
+    this.x = x;
+    this.y = y;
+    this.health = 1000;
+    this.damage = 50;
+    this.speed = 1;
+    this.width = 50;
+    this.height = 50;
+    this.coin = 100;
+    this.colour = "yellow";
+    this.range = 30;
+    // decideds if there are troops close enough to attack
+    this.attackState = "calm";
+    // dead code
+    this.closestTroop = width;
+    // saves the ndex of the closest troop so that it can be tracked
+    this.closestTroopIndex = 0;
+    // how close an enemy needs to be to attarct enemy attention
+    this.agitationRange = 80;
+    // sees how close the eneimes are
+    this.enemyDistance = width;
+    // used in targeting to see enemies x coordinate
+    this.enemyX = width;
+    // used in targeting to see enemies y coordinate
+    this.enemyY = height;
+    // makes sure the enemies is a valid target
+    this.enemyNumbers = 0;
+    this.knockback = 50;
+  }
+
+  // displays boss
+  display(){
+    noStroke();
+    rectMode(CENTER);
+    fill(this.colour);
+    rect(this.x, this.y, this.width, this.height);
+  }
+
+  attackTroops(theTroops){
+    for(let target of theTroops){
+      this.enemyDistance = dist(this.x, this.y, target.x, target.y);
+      if(this.enemyDistance < this.range && frameCount%60 === 0){
+        target.health -= this.damage;
+        if(target.x > this.x){
+          target.x += this.knockback;
+          lifted = true;
+        }
+        else if(target.x < this.x){
+          target.x -= this.knockback;
+          lifted = true;
+        }
+      }
+    }
+  }
+
+  seeTroops(trooper){
+    // checks to see if a troops has been deleted
+    if(trooper.length < this.enemyNumbers){
+      // resets targeting for the enemies
+      this.enemyX = width;
+      this.enemyY = height;
+    }
+    // goes through all possible targets
+    for(let target = trooper.length - 1; target >= 0; target --){
+      // checks the distance of the current troop in the array
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      if(this.attackState === "agitated" && this.spearCheck){
+        // checks if another troop is closer
+        if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+          // resets target if it is closer
+          this.enemyX = trooper[target].x;
+          this.enemyY = trooper[target].y;
+          // targets the new troops]
+          this.closestTroopIndex = target;
+        }
+        else{
+          // resets circuit to see if another troop is closer
+          this.enemyNumbers = theTroops.length;
+        }
+      }
+      // if(frameCount%30 === 0){
+      //   console.log(this.enemyDistance);
+      // }
+    }
+    if(this.spearCheck){
+      this.spearCheck = false;
+    }
+    else{
+      this.spearCheck = true;
+    }
+  }
+
+  agitation(theTroops){
+    // goes through all possible targets
+    for(let target = theTroops.length - 1; target >= 0; target --){
+      // checks how close the targets
+      this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
+      // if targets are cloes enough the enemy becomes agitated
+      if(this.enemyDistance < this.agitationRange){
+        this.attackState = "agitated";
+      }
+    }
+    if(this.closestTroopIndex > theTroops.length - 1){
+      this.attackState = "calm";
+    }
+  }
+
+  // checks values when player moves troops around
+  doubleCheckMouseLift(){
+    // checks if player is lifting troops
+    if(doubleCheck === "yes"){
+      // resets values
+      this.enemyX = width;
+      this.enemyY = height;
+      this.enemyDistance = width;
+      // turns off double check function
+      if(millis() > doubleCheckHelper){
+        doubleCheck = "no";
+      }
+    }
+  }
+
+  move(){
+    // normal state
+    if(this.attackState === "calm" && this.x < width){
+      this.x += this.speed;
+    }
+    if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+      if(this.enemyX > this.x){
+        this.x += this.speed;
+      }
+      if(this.enemyY > this.y){
+        this.y += this.speed;
+      }
+      if(this.enemyY < this.y){
+        this.y -= this.speed;
+      }
+      if(this.enemyX < this.x){
+        this.x -= this.speed;
+      }
+    }
+    // makes sure the enemies are in agitation range
+    if (this.enemyDistance > this.agitationRange){
+      this.attackState = "calm";
+    }
+  }
+
+  target(pointsArray){
+    for(let otherPoint of pointsArray){
+      let pointDistance = dist(this.x, this.y, otherPoint.x, otherPoint.y);
+      if(pointDistance < this.agitationRange){
+        stroke("green");
+        line(this.x, this.y, otherPoint.x, otherPoint.y);
+      }
+      
+    }
+  }
+
+  soundEffects(){
+    if(frameCount%Math.round(random(60, 120)*10) === 0){
+      // plays sound effect
+      zombieGroan.play();
+    }
+  }
+
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 }
@@ -681,18 +851,18 @@ function draw() {
   // spawnEnemies();
   for(let troops of theTroops){
     if(gameState === "pause" || gameState === "go"){
+      // lets you move the troops around with your mouse
+      troops.mouseMove();
+      // checks to see if you're allowed to move the troops
+      troops.mouseMoveSetup();
+      // makes sure the troops don't stack
+      troops.spaceOut(theTroops);
       // shows the troops
       troops.display();
     }
     if(gameState === "go"){
       // lets troops attack enemies
       troops.attackTroops(theEnemies);
-      // lets you move the troops around with your mouse
-      troops.mouseMove();
-      // checks to see if you're allowed to move the troops
-      troops.mouseMoveSetup();
-      // currently out of order
-      troops.spaceOut(theTroops);
     }
   }
   // carries out functions needed to control the enemies
@@ -775,6 +945,11 @@ function mousePressed(){
     let someEnemy = new Skeleton(mouseX, mouseY);
     theEnemies.push(someEnemy);
   }
+
+  if(keyIsDown(66)){
+    let someEnemy = new BossMonster(mouseX, mouseY);
+    theEnemies.push(someEnemy);
+  }
 }
 
 
@@ -785,6 +960,10 @@ function spawnEnemies(){
     // adds enemies based on the danger score
     for(let q = dangerScore; q > 0; q -= ZOMBIEDANGER){
       let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
+      theEnemies.push(someEnemy);
+    }
+    if(roundCounter%5 ===0){
+      let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30));
       theEnemies.push(someEnemy);
     }
     // increases danger score for next round
@@ -811,20 +990,23 @@ function buyTroops(){
 }
 
 function pause(){
-  if(keyIsDown(80) && gameState === "go" && frameCount%5 === 0){
+  if(keyIsDown(80) && gameState === "go" && millis() > q){
     gameState = "pause";
+    q = millis() + 500;
   }
-  else if(keyIsDown(80) && gameState === "pause" && frameCount%5 === 0){
+  else if(keyIsDown(80) && gameState === "pause" && millis() > q){
     gameState = "go";
+    q = millis() + 500;
   }
   if(gameState === "pause"){
     textAlign(CENTER, CENTER);
     textSize(30);
-    fill(0);
-    text("Controls", width/2, height/2);
+    fill("red");
+    // text("Controls", width/2, height/2);
     textSize(15);
     text("Press the mouse and Z to spawn a sword troop, press the mouse and D to spawn a spear troop", width/2, height/2 + height/10);
     text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
+    text("your coins are displayed at the top of the screen you get more by killing enemies, and can use them to buy troops", width/2, height/2 +height/10 +height/15);
     text("press P to unpause", width/2, height/2 + height/5);
   }
   if(gameState === "go"){

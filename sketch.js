@@ -11,6 +11,8 @@ const SWORDCOST = 20;
 const ZOMBIEDANGER = 10;
 // cost of a spear troop
 const SPEARCOST = 30;
+// skeleton danger value
+const SKELEDANGER = 20;
 
 // holds all of the troops bought by the player
 let theTroops = [];
@@ -36,6 +38,8 @@ let gameState = "start";
 let lifted = false;
 
 let q = 0;
+
+let roundDanger;
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
@@ -165,7 +169,7 @@ class SpearMan{
     // troops y value
     this.y = y;
     // troops health
-    this.health = 50;
+    this.health = 51;
     // troops damage beyond a range of 25
     this.damage25Plus = 40;
     // troops damage less than a range of 25
@@ -327,7 +331,7 @@ class Zombie{
     this.width = 30;
     this.colour = "green";
     // how many coins the zombie gives on death
-    this.coin = 5;
+    this.coin = Math.round(random(8, 12));
     this.range = 20;
     // decideds if there are troops close enough to attack
     this.attackState = "calm";
@@ -492,13 +496,13 @@ class Skeleton{
     this.x = x;
     this.y = y;
     this.health = 40;
-    this.damage = 25;
+    this.damage = 26;
     this.speed = 2;
     this.height = 30;
     this.width = 30;
     this.colour = "white";
     // how many coins the zombie gives on death
-    this.coin = 5;
+    this.coin = Math.round(random(13, 17));
     this.range = 20;
     // decideds if there are troops close enough to attack
     this.attackState = "calm";
@@ -676,12 +680,12 @@ class BossMonster{
   constructor(x,y){
     this.x = x;
     this.y = y;
-    this.health = 1000;
+    this.health = 500;
     this.damage = 50;
     this.speed = 1;
     this.width = 50;
     this.height = 50;
-    this.coin = 100;
+    this.coin = 200;
     this.colour = "yellow";
     this.range = 30;
     // decideds if there are troops close enough to attack
@@ -713,16 +717,51 @@ class BossMonster{
 
   attackTroops(theTroops){
     for(let target of theTroops){
+      // checks of the troop is close enough to attack
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(this.enemyDistance < this.range && frameCount%60 === 0){
+      if(this.enemyDistance < this.range && frameCount%30 === 0){
+        // does damage to the enemy
         target.health -= this.damage;
+        // does knockback to enemy
         if(target.x > this.x){
           target.x += this.knockback;
-          lifted = true;
+          this.enemyX = width;
+          this.enemyY = height;
         }
         else if(target.x < this.x){
           target.x -= this.knockback;
-          lifted = true;
+          this.enemyX = width;
+          this.enemyY = height;
+        }
+        if(target.y > this.y){
+          target.y += this.knockback;
+          this.enemyX = width;
+          this.enemyY = height;
+        }
+        else if(target.y < this.y){
+          target.y -= this.knockback;
+          this.enemyX = width;
+          this.enemyY = height;
+        }
+        if(target.x === this.x){
+          if(random(2) > 1){
+            target.x += this.knockback;
+          }
+          else{
+            target.x -= this.knockback;
+          }
+          this.enemyX = width;
+          this.enemyY = height;
+        }
+        if(target.y === this.y){
+          if(random(2) > 1){
+            target.y += this.knockback;
+          }
+          else{
+            target.y -= this.knockback;
+          }
+          this.enemyX = width;
+          this.enemyY = height;
         }
       }
     }
@@ -739,29 +778,21 @@ class BossMonster{
     for(let target = trooper.length - 1; target >= 0; target --){
       // checks the distance of the current troop in the array
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      if(this.attackState === "agitated" && this.spearCheck){
-        // checks if another troop is closer
-        if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
-          // resets target if it is closer
-          this.enemyX = trooper[target].x;
-          this.enemyY = trooper[target].y;
-          // targets the new troops]
-          this.closestTroopIndex = target;
-        }
-        else{
-          // resets circuit to see if another troop is closer
-          this.enemyNumbers = theTroops.length;
-        }
+      // checks if another troop is closer
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
+        this.enemyX = trooper[target].x;
+        this.enemyY = trooper[target].y;
+        // targets the new troops]
+        this.closestTroopIndex = target;
+      }
+      else{
+        // resets circuit to see if another troop is closer
+        this.enemyNumbers = theTroops.length;
       }
       // if(frameCount%30 === 0){
       //   console.log(this.enemyDistance);
       // }
-    }
-    if(this.spearCheck){
-      this.spearCheck = false;
-    }
-    else{
-      this.spearCheck = true;
     }
   }
 
@@ -800,6 +831,7 @@ class BossMonster{
     if(this.attackState === "calm" && this.x < width){
       this.x += this.speed;
     }
+    // moves enemy to closest target to attack them
     if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
       if(this.enemyX > this.x){
         this.x += this.speed;
@@ -820,6 +852,7 @@ class BossMonster{
     }
   }
 
+  // test code
   target(pointsArray){
     for(let otherPoint of pointsArray){
       let pointDistance = dist(this.x, this.y, otherPoint.x, otherPoint.y);
@@ -831,6 +864,7 @@ class BossMonster{
     }
   }
 
+  // te,porary sound effect, will change later
   soundEffects(){
     if(frameCount%Math.round(random(60, 120)*10) === 0){
       // plays sound effect
@@ -848,7 +882,6 @@ function draw() {
   background(220);
   pause();
   // carries out functions needed to control the troops
-  // spawnEnemies();
   for(let troops of theTroops){
     if(gameState === "pause" || gameState === "go"){
       // lets you move the troops around with your mouse
@@ -893,6 +926,8 @@ function draw() {
     buyTroops();
     // gets rid of dead enemies/troops
     killTheDead();
+
+    spawnEnemies();
   }
 
 }
@@ -935,7 +970,7 @@ function mousePressed(){
       coins -= SPEARCOST;
     }
   }
-  // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function)
+  // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function) to be used in testing
   if(keyIsDown(67)){
     let someEnemy = new Zombie(mouseX, mouseY);
     theEnemies.push(someEnemy);
@@ -953,16 +988,53 @@ function mousePressed(){
 }
 
 
-// will eventually spawn enemies in waves based on difficulty
+// spanws enemys to fight against
 function spawnEnemies(){
-  // makes sure all previous enemies are dead
+  let roundDanger = dangerScore;
+  // tells player how to spawn next wave
   if(theEnemies.length < 1){
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text("Press Q to spawn next wave", width/2, height/2);
+  }
+  // spawns new enemies if the player starts the bext wave
+  if(theEnemies.length < 1 && keyIsDown(81)){
     // adds enemies based on the danger score
-    for(let q = dangerScore; q > 0; q -= ZOMBIEDANGER){
-      let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
-      theEnemies.push(someEnemy);
+    while(roundDanger > 0){
+      if(roundCounter > 1){
+        let z = random(100);
+        if(z > 50){
+          let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
+          theEnemies.push(someEnemy);
+          roundDanger  -= ZOMBIEDANGER;
+        }
+        else{
+          let someEnemy = new Skeleton(30 + random(-30, 30), random(30, height - 30));
+          theEnemies.push(someEnemy);
+          roundDanger -= SKELEDANGER;
+        }
+      }
+      else if(roundCounter > 2){
+        let z = random(100);
+        if(z > 33){
+          let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
+          theEnemies.push(someEnemy);
+          roundDanger  -= ZOMBIEDANGER;
+        }
+        else{
+          let someEnemy = new Skeleton(30 + random(-30, 30), random(30, height - 30));
+          theEnemies.push(someEnemy);
+          roundDanger -= SKELEDANGER;
+        }
+      }
+      else{
+        let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
+        theEnemies.push(someEnemy);
+        roundDanger  -= ZOMBIEDANGER;
+      }
     }
-    if(roundCounter%5 ===0){
+    // spawns bosses every 5 rounds 
+    if(roundCounter%5 ===0 && roundCounter > 1){
       let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30));
       theEnemies.push(someEnemy);
     }
@@ -974,7 +1046,7 @@ function spawnEnemies(){
   }
 }
 
-
+// old code that was meant to test targeting system
 function keyPressed(){
   // was meant for testing, is no longer useful, will remove later
   // if(key === "x"){
@@ -982,14 +1054,17 @@ function keyPressed(){
   // }
 }
 
+// not actually what functions says, instead displays the amount of coins you have
 function buyTroops(){
   fill("black");
   textAlign(CENTER, CENTER);
-  textSize(20);
+  textSize(15);
   text("You have " + coins +" coins", width/2, height/30);
 }
 
+// lets the player pause the game
 function pause(){
+  // makes sure the player can actually pause the game and can't spam it
   if(keyIsDown(80) && gameState === "go" && millis() > q){
     gameState = "pause";
     q = millis() + 500;
@@ -998,26 +1073,29 @@ function pause(){
     gameState = "go";
     q = millis() + 500;
   }
+  // displays pause text so that the player knows what the game is about
   if(gameState === "pause"){
     textAlign(CENTER, CENTER);
     textSize(30);
     fill("red");
-    // text("Controls", width/2, height/2);
     textSize(15);
     text("Press the mouse and Z to spawn a sword troop, press the mouse and D to spawn a spear troop", width/2, height/2 + height/10);
     text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
     text("your coins are displayed at the top of the screen you get more by killing enemies, and can use them to buy troops", width/2, height/2 +height/10 +height/15);
     text("press P to unpause", width/2, height/2 + height/5);
   }
+  // tells the player how to pause and what they can see in the pause menu
   if(gameState === "go"){
     textAlign(LEFT, CENTER);
-    textSize(20);
+    textSize(15);
     fill(0);
     text("Press P to pause the game and see the controls", 0, height/30);
   }
+  // starts the game
   if(gameState === "start" && keyIsDown(71)){
     gameState = "go";
   }
+  // start screen 
   if(gameState === "start"){
     textAlign(CENTER, CENTER);
     textSize(30);

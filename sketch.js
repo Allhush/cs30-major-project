@@ -19,7 +19,6 @@ let theTroops = [];
 // hold all of the enemies that spawn
 let theEnemies = [];
 // holds the coins the player uses to buy troops
-let coins = 500;
 // danger value of the wave of the wave 
 let dangerScore = 100;
 // counts rounds
@@ -32,18 +31,24 @@ let zombieGroan;
 let doubleCheck = "no";
 // makes sure that double check has enough time to reset the targeting
 let doubleCheckHelper = 0;
-
+// tells the game what it should display
 let gameState = "start";
-
+// checks to see if the troops are being moved around
 let lifted = false;
-
+// makes sure you can't spam pause and unpause
 let q = 0;
-
+// keeps track of how many zombie should be spawned each round
 let roundDanger;
+// used to make sound for skeletons
+let skeleClink;
+// used to make sound for speartroops
+let spearSound;
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
   zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
+  skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
+  spearSound = loadSound("Assets/soundEffects/spear.mp3");
 }
 
 // most basic troop that the player can buy
@@ -56,7 +61,7 @@ class SwordTroop{
     // troops y value
     this.y = y;
     // troops health
-    this.health = 75;
+    this.health = 60;
     // troops damage
     this.damage = 20;
     // troops height
@@ -74,6 +79,9 @@ class SwordTroop{
     // small delay used in some functions
     this.delay = 100;
     this.space = 15;
+
+    this.enemyX = width;
+    this.enemyY = height;
   }
 
   // displays the troop
@@ -101,7 +109,6 @@ class SwordTroop{
       }
     }
   }
-
 
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
@@ -246,14 +253,14 @@ class SpearMan{
     if(enemyDistance < this.range1 && enemyDistance > this.range2 && frameCount%60 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
       theEnemies[this.closestTroopIndex].health -= 50;
       // plays sound effect
-      swordSlash.play();
+      spearSound.play();
       // console.log("damaging");
       this.closestTroopIndex = -1;
     }
     else if(enemyDistance <= this.range2 && frameCount%60 === 0 && this.closestTroopIndex < theEnemies.length){
       theEnemies[this.closestTroopIndex].health -= 5;
       // plays sound effect
-      swordSlash.play();
+      spearSound.play();
       // console.log("damaging2");
     }
   }
@@ -331,7 +338,7 @@ class Zombie{
     this.width = 30;
     this.colour = "green";
     // how many coins the zombie gives on death
-    this.coin = Math.round(random(8, 12));
+    this.coin = Math.round(random(6, 10));
     this.range = 20;
     // decideds if there are troops close enough to attack
     this.attackState = "calm";
@@ -502,7 +509,7 @@ class Skeleton{
     this.width = 30;
     this.colour = "white";
     // how many coins the zombie gives on death
-    this.coin = Math.round(random(13, 17));
+    this.coin = Math.round(random(8, 12));
     this.range = 20;
     // decideds if there are troops close enough to attack
     this.attackState = "calm";
@@ -542,7 +549,7 @@ class Skeleton{
   attackTroops(theTroops){
     for(let target of theTroops){
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(this.enemyDistance < this.range && frameCount%60 === 0){
+      if(this.enemyDistance < this.range && frameCount%40 === 0){
         target.health -= this.damage;
       }
     }
@@ -658,7 +665,7 @@ class Skeleton{
   soundEffects(){
     if(frameCount%Math.round(random(60, 120)*10) === 0){
       // plays sound effect
-      zombieGroan.play();
+      skeleClink.play();
     }
   }
 
@@ -926,8 +933,10 @@ function draw() {
     buyTroops();
     // gets rid of dead enemies/troops
     killTheDead();
-
+    // spawns troops
     spawnEnemies();
+    // ends game if you die
+    theEndAndTheDeath();
   }
 
 }
@@ -1039,7 +1048,7 @@ function spawnEnemies(){
       theEnemies.push(someEnemy);
     }
     // increases danger score for next round
-    dangerScore += Math.round(random(2,4))*10;
+    dangerScore += Math.round(random(3,7))*10;
     // increases the round number
     roundCounter ++;
     console.log(theEnemies.length);
@@ -1060,6 +1069,7 @@ function buyTroops(){
   textAlign(CENTER, CENTER);
   textSize(15);
   text("You have " + coins +" coins", width/2, height/30);
+  text("Round: " + roundCounter, width/2 + width/4, height/30);
 }
 
 // lets the player pause the game
@@ -1080,6 +1090,7 @@ function pause(){
     fill("red");
     textSize(15);
     text("Press the mouse and Z to spawn a sword troop, press the mouse and D to spawn a spear troop", width/2, height/2 + height/10);
+    text("If you press and hold one one the troops with your mouse you can move them around", width/2, height/2 + height/7.5);
     text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
     text("your coins are displayed at the top of the screen you get more by killing enemies, and can use them to buy troops", width/2, height/2 +height/10 +height/15);
     text("press P to unpause", width/2, height/2 + height/5);
@@ -1101,5 +1112,20 @@ function pause(){
     textSize(30);
     fill(0);
     text("press G to start", width/2, height/2);
+  }
+
+  if(gameState === "over"){
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    fill(0);
+    text("You died, reload the page to restart", width/2, height/2);
+  }
+}
+
+function theEndAndTheDeath(){
+  for(let enemy of theEnemies){
+    if(enemy.x >= width){
+      gameState = "over";
+    }
   }
 }

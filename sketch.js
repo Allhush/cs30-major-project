@@ -80,7 +80,7 @@ class SwordTroop{
     // small delay used in some functions
     this.delay = 100;
     this.space = 15;
-
+    this.enemyCount = 0;
     this.enemyX = width;
     this.enemyY = height;
   }
@@ -104,8 +104,22 @@ class SwordTroop{
       let enemyDistance = dist(this.x, this.y, target.x, target.y);
       // attacks enemies
       if(enemyDistance < this.range && frameCount%60 === 0){
-        target.health -= this.damage;
+        if(this.enemyCount <= 2){
+          target.health -= this.damage;
+          console.log("damage1");
+        }
+        else if(this.enemyCount < 5){
+          target.health -= this.damage/2;
+          console.log("damage2");
+        }
+        else{
+          target.health -= this.damage/5;
+          console.log("damage3");
+        }
         // plays sound effect
+        if(target.health < 10){
+          this.enemyCount --;
+        }
         swordSlash.play();
       }
     }
@@ -166,6 +180,21 @@ class SwordTroop{
     }
   }
 
+  boundsCheck(){
+    if(this.x > width){
+      this.x -= 10;
+    }
+    if(this.x < 0){
+      this.x +=10;
+    }
+    if(this.y > height){
+      this.y -= 10;
+    }
+    if(this.y < 0){
+      this.y +=10;
+    }
+  }
+
 }
 
 class SpearMan{
@@ -205,6 +234,7 @@ class SpearMan{
     this.enemyDistance;
     this.closestTroopIndex = -1;
     this.enemyNumbers = 0;
+    this.enemyCount = 0;
   }
 
   // displays the troop
@@ -293,6 +323,21 @@ class SpearMan{
     }
   }
 
+  boundsCheck(){
+    if(this.x > width){
+      this.x -= 10;
+    }
+    if(this.x < 0){
+      this.x +=10;
+    }
+    if(this.y > height){
+      this.y -= 10;
+    }
+    if(this.y < 0){
+      this.y +=10;
+    }
+  }
+
   // makes sure you can't stack troops on top of one another
   spaceOut(trooper){
     // goes through all the troops
@@ -357,6 +402,8 @@ class Zombie{
     this.enemyY = height;
     // makes sure the enemies is a valid target
     this.enemyNumbers = 0;
+    // helps with sowrd damage drop off
+    this.counter = true;
   }
 
   // displays zombies
@@ -407,8 +454,10 @@ class Zombie{
         this.enemyY = trooper[target].y;
         // targets the new troops]
         this.closestTroopIndex = target;
+        // tells zombie it can count to enemy damage drop off again
+        this.counter = true;
         // test stuff, not important
-        // console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
+        console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
       }
       else{
         // resets circuit to see if another troop is closer
@@ -467,6 +516,11 @@ class Zombie{
       }
       if(this.enemyX < this.x){
         this.x -= this.speed;
+      }
+      if(dist(this.x, this.y, this.enemyX, this.enemyY) < this.agitation && this.counter){
+        theTroops[this.closestTroopIndex].enemyCount ++;
+        this.counter = false;
+        console.log("yes");
       }
     }
     // makes sure the enemies are in agitation range
@@ -597,6 +651,7 @@ class Skeleton{
       // if(frameCount%30 === 0){
       //   console.log(this.enemyDistance);
       // }
+      
     }
     if(this.spearCheck){
       this.spearCheck = false;
@@ -686,6 +741,7 @@ class Skeleton{
 
 class BossMonster{
   constructor(x,y){
+    this.identify = "BossMonster";
     this.x = x;
     this.y = y;
     this.health = 500;
@@ -892,16 +948,18 @@ function draw() {
   // carries out functions needed to control the troops
   for(let troops of theTroops){
     if(gameState === "pause" || gameState === "go"){
+      // shows the troops
+      troops.display();
+      // makes sure you can't force troops out of bounds
+      troops.boundsCheck();
+    }
+    if(gameState === "go"){
       // lets you move the troops around with your mouse
       troops.mouseMove();
       // checks to see if you're allowed to move the troops
       troops.mouseMoveSetup();
       // makes sure the troops don't stack
       troops.spaceOut(theTroops);
-      // shows the troops
-      troops.display();
-    }
-    if(gameState === "go"){
       // lets troops attack enemies
       troops.attackTroops(theEnemies);
     }
@@ -948,8 +1006,19 @@ function killTheDead(){
   for(let i = theEnemies.length - 1; i >= 0; i --){
     // checks to see if the enemies still have health
     if(theEnemies[i].health <= 0){
-      // add enemy coins to purse
-      coins += theEnemies[i].coin;
+      if(roundCounter <= 5){
+        // add enemy coins to purse
+        coins += theEnemies[i].coin;
+      }
+      else if(roundCounter <= 10 || theEnemies[i].identify === "BossMonster"){
+        coins += Math.round(theEnemies[i].coin/2);
+      }
+      else if (roundCounter <= 20){
+        coins += 5;
+      }
+      else{
+        coins +=2;
+      }
       // gets rid of enemy
       theEnemies.splice(i, 1);
     }
@@ -966,18 +1035,20 @@ function killTheDead(){
 
 function mousePressed(){
   // spawns troops
-  if(coins >= 20){
-    if(keyIsDown(90)){
-      let someTroop = new SwordTroop(mouseX, mouseY);
-      theTroops.push(someTroop);
-      coins -= SWORDCOST;
+  if(gameState === "go"){
+    if(coins >= 20){
+      if(keyIsDown(90)){
+        let someTroop = new SwordTroop(mouseX, mouseY);
+        theTroops.push(someTroop);
+        coins -= SWORDCOST;
+      }
     }
-  }
-  if(coins >= 30){
-    if(keyIsDown(68)){
-      let someTroop = new SpearMan(mouseX, mouseY);
-      theTroops.push(someTroop);
-      coins -= SPEARCOST;
+    if(coins >= 30){
+      if(keyIsDown(68)){
+        let someTroop = new SpearMan(mouseX, mouseY);
+        theTroops.push(someTroop);
+        coins -= SPEARCOST;
+      }
     }
   }
   // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function) to be used in testing
@@ -1049,7 +1120,7 @@ function spawnEnemies(){
       theEnemies.push(someEnemy);
     }
     // increases danger score for next round
-    dangerScore += Math.round(random(3,7))*10;
+    dangerScore += Math.round(random(3,7))*10*roundCounter;
     // increases the round number
     roundCounter ++;
     console.log(theEnemies.length);

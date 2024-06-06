@@ -19,6 +19,7 @@ let theTroops = [];
 // hold all of the enemies that spawn
 let theEnemies = [];
 // holds the coins the player uses to buy troops
+let coins = 300;
 // danger value of the wave of the wave 
 let dangerScore = 100;
 // counts rounds

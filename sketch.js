@@ -57,6 +57,10 @@ let zombieImage2;
 let skeleImage2;
 let healerImage;
 let healerImage2;
+let zombieOWImage;
+let skeleOWImage;
+let swordOWImage;
+let spearOWImage;
 // used in pause state so player can see different things
 let seeState = "main";
 // used to time healer animation
@@ -72,11 +76,15 @@ function preload(){
   spearImage = loadImage("Assets/Images/Spear1.png");
   spearImage2 = loadImage("Assets/Images/Spear2.png");
   zombieImage = loadImage("Assets/Images/Zombie1.png");
-  zombieImages2 = loadImage("Assets/Images/Zombie2.png");
+  zombieImage2 = loadImage("Assets/Images/Zombie2.png");
   skeleImage = loadImage("Assets/Images/Skeleton1.png");
   skeleImage2 = loadImage("Assets/Images/Skeleton2.png");
   healerImage = loadImage("Assets/Images/Healer1.png");
   healerImage2 = loadImage("Assets/Images/Healer2.png");
+  zombieOWImage = loadImage("Assets/Images/zombie1OW.png");
+  skeleOWImage = loadImage("Assets/Images/skeleton1OW.png");
+  swordOWImage = loadImage("Assets/Images/sword1OW.png");
+  spearOWImage = loadImage("Assets/Images/spearOW.png");
 }
 
 // most basic troop that the player can buy
@@ -115,6 +123,10 @@ class SwordTroop{
   // displays the troop
   display(){
     noStroke();
+    // creates health bar
+    fill(this.colour);
+    rectMode(CENTER);
+    rect(this.x, this.y - this.height + 15, this.health/2, 3);
     // centers troop
     imageMode(CENTER);
     // places troop at correct position with correct height and length
@@ -267,8 +279,10 @@ class SpearMan{
     noStroke();
     // centers troop
     imageMode(CENTER);
-    // sets troops temporary color
+    // creates health bar
     fill(this.colour);
+    rectMode(CENTER);
+    rect(this.x, this.y - this.height + 15, this.health/2, 3);
     // places troop at correct position with correct height and length
     image(spearImage,this.x, this.y, this.width, this.height);
   }
@@ -436,7 +450,20 @@ class Zombie{
     noStroke();
     imageMode(CENTER);
     fill(this.colour);
-    image(zombieImage,this.x, this.y, this.width, this.height);
+    if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+      image(zombieImage,this.x, this.y, this.width, this.height);
+    }
+    else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+      image(zombieOWImage, this.x, this.y, this.width, this.height); 
+    }
+    else{
+      image(zombieImage,this.x, this.y, this.width, this.height);
+    }
+    
+    // creates health bar
+    fill(this.colour);
+    rectMode(CENTER);
+    rect(this.x, this.y - this.height + 15, this.health/2, 3);
   }
 
   // dead code
@@ -615,7 +642,15 @@ class Skeleton{
     noStroke();
     imageMode(CENTER);
     fill(this.colour);
-    image(skeleImage,this.x, this.y, this.width, this.height);
+    if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+      image(skeleImage,this.x, this.y, this.width, this.height);
+    }
+    else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+      image(skeleOWImage, this.x, this.y, this.width, this.height); 
+    }
+    else{
+      image(skeleImage,this.x, this.y, this.width, this.height);
+    }
   }
 
   // dead code
@@ -963,15 +998,18 @@ class Healer{
   display(){
     noStroke();
     imageMode(CENTER);
-    fill(this.colour);
+    fill(100, 200, 75, 50);
+    circle(this.x, this.y, this.healRange);
     if(this.animation2 === "false"){
       image(healerImage, this.x, this.y, this.width, this.height);
     }
     else if(this.animation2 === "true"){
       image(healerImage2, this.x, this.y, this.width, this.height);
     }
-    fill(100, 200, 75, 50);
-    circle(this.x, this.y, this.healRange);
+    // creates health bar
+    fill(this.colour);
+    rectMode(CENTER);
+    rect(this.x, this.y - this.height + 15, this.health/3, 3);
   }
   heal(theTroops){
     for(let troop of theTroops){
@@ -1191,6 +1229,13 @@ function mousePressed(){
         coins -= SPEARCOST;
       }
     }
+    if(coins >=25){
+      if(keyIsDown(72)){
+        let someTroop = new Healer(mouseX, mouseY);
+        theTroops.push(someTroop);
+        coins -= HEALCOST;
+      }
+    }
   }
   // spawns enemies(not intended as a feature will be removed and replaced with spawn enemies function) to be used in testing
   if(keyIsDown(67)){
@@ -1198,10 +1243,6 @@ function mousePressed(){
     theEnemies.push(someEnemy);
   }
 
-  if(keyIsDown(72)){
-    let someTroop = new Healer(mouseX, mouseY);
-    theTroops.push(someTroop);
-  }
 
   if(keyIsDown(65)){
     let someEnemy = new Skeleton(mouseX, mouseY);
@@ -1389,7 +1430,7 @@ function theEndAndTheDeath(){
     if(enemy.x >= width){
       gameState = "over";
     }
-    }
+  }
   if(gameState === "over"){
     theEnemies.splice(0, theEnemies.length);
     theTroops.splice(0,theTroops.length);

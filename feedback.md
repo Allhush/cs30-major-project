@@ -14,3 +14,9 @@
 - add more troops
 
 ## person without coding experience
+- add more about buying troops
+- explain troops abilities more, and how they cost more or less
+- tell them they can move troops
+- tell them more about coin system and how that does with troops
+- explain different enemies better
+- make beginning easier with more plentiful coins

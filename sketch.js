@@ -13,6 +13,8 @@ const ZOMBIEDANGER = 10;
 const SPEARCOST = 30;
 // skeleton danger value
 const SKELEDANGER = 20;
+// healer cost
+const HEALCOST = 25;
 
 // holds all of the troops bought by the player
 let theTroops = [];
@@ -44,12 +46,37 @@ let roundDanger;
 let skeleClink;
 // used to make sound for speartroops
 let spearSound;
+// used to display troops and enemies
+let swordImage;
+let spearImage;
+let zombieImage;
+let skeleImage;
+let swordImage2;
+let spearImage2;
+let zombieImage2;
+let skeleImage2;
+let healerImage;
+let healerImage2;
+// used in pause state so player can see different things
+let seeState = "main";
+// used to time healer animation
+let healtime = 0;
 
 function preload(){
   swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
   zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
   skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
   spearSound = loadSound("Assets/soundEffects/spear.mp3");
+  swordImage = loadImage("Assets/Images/Sword1.png");
+  swordImage2 = loadImage("Assets/Images/Sword2.png");
+  spearImage = loadImage("Assets/Images/Spear1.png");
+  spearImage2 = loadImage("Assets/Images/Spear2.png");
+  zombieImage = loadImage("Assets/Images/Zombie1.png");
+  zombieImages2 = loadImage("Assets/Images/Zombie2.png");
+  skeleImage = loadImage("Assets/Images/Skeleton1.png");
+  skeleImage2 = loadImage("Assets/Images/Skeleton2.png");
+  healerImage = loadImage("Assets/Images/Healer1.png");
+  healerImage2 = loadImage("Assets/Images/Healer2.png");
 }
 
 // most basic troop that the player can buy
@@ -79,7 +106,7 @@ class SwordTroop{
     this.liftState = false;
     // small delay used in some functions
     this.delay = 100;
-    this.space = 15;
+    this.space = 20;
     this.enemyCount = 0;
     this.enemyX = width;
     this.enemyY = height;
@@ -89,11 +116,9 @@ class SwordTroop{
   display(){
     noStroke();
     // centers troop
-    rectMode(CENTER);
-    // sets troops temporary color
-    fill(this.colour);
+    imageMode(CENTER);
     // places troop at correct position with correct height and length
-    rect(this.x, this.y, this.width, this.height);
+    image(swordImage,this.x, this.y, 30, 30);
   }
 
   // lets troops attack enemies
@@ -227,7 +252,7 @@ class SpearMan{
     this.liftState = false;
     // small delay used in some functions
     this.delay = 100;
-    this.space = 15;
+    this.space = 20;
     // all of these are used to identify the closest troop so it can't one shot everything
     this.enemyX = width;
     this.enemyY = height;
@@ -241,11 +266,11 @@ class SpearMan{
   display(){
     noStroke();
     // centers troop
-    rectMode(CENTER);
+    imageMode(CENTER);
     // sets troops temporary color
     fill(this.colour);
     // places troop at correct position with correct height and length
-    rect(this.x, this.y, this.width, this.height);
+    image(spearImage,this.x, this.y, this.width, this.height);
   }
 
   // lets troops attack enemies
@@ -409,9 +434,9 @@ class Zombie{
   // displays zombies
   display(){
     noStroke();
-    rectMode(CENTER);
+    imageMode(CENTER);
     fill(this.colour);
-    rect(this.x, this.y, this.width, this.height);
+    image(zombieImage,this.x, this.y, this.width, this.height);
   }
 
   // dead code
@@ -588,9 +613,9 @@ class Skeleton{
   // displays skeleton
   display(){
     noStroke();
-    rectMode(CENTER);
+    imageMode(CENTER);
     fill(this.colour);
-    rect(this.x, this.y, this.width, this.height);
+    image(skeleImage,this.x, this.y, this.width, this.height);
   }
 
   // dead code
@@ -626,38 +651,18 @@ class Skeleton{
     for(let target = trooper.length - 1; target >= 0; target --){
       // checks the distance of the current troop in the array
       this.enemyDistance = dist(this.x, this.y, theTroops[target].x, theTroops[target].y);
-      if(this.attackState === "agitated" && this.spearCheck){
-        // if(this.enemyDistance < this.agitationRange && trooper[target].identify === "spear"){
-        //   // resets target if it is higher priority
-        //   this.enemyX = trooper[target].x;
-        //   this.enemyY = trooper[target].y;
-        //   // targets the new troops]
-        //   this.closestTroopIndex = target;
-        //   console.log("special case");
-        // }
-        // checks if another troop is closer
-        if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
-          // resets target if it is closer
-          this.enemyX = trooper[target].x;
-          this.enemyY = trooper[target].y;
-          // targets the new troops]
-          this.closestTroopIndex = target;
-        }
-        else{
-          // resets circuit to see if another troop is closer
-          this.enemyNumbers = theTroops.length;
-        }
+      // checks if another troop is closer
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
+        this.enemyX = trooper[target].x;
+        this.enemyY = trooper[target].y;
+        // targets the new troops]
+        this.closestTroopIndex = target;
       }
-      // if(frameCount%30 === 0){
-      //   console.log(this.enemyDistance);
-      // }
-      
-    }
-    if(this.spearCheck){
-      this.spearCheck = false;
-    }
-    else{
-      this.spearCheck = true;
+      else{
+        // resets circuit to see if another troop is closer
+        this.enemyNumbers = theTroops.length;
+      } 
     }
   }
 
@@ -938,6 +943,137 @@ class BossMonster{
 
 }
 
+class Healer{
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
+    this.health = 100;
+    this.damage = 0;
+    this.height = 30;
+    this.width = 30;
+    this.identify = "heal";
+    this.colour = "brown";
+    this.healRange = 100;
+    this.healthPlus = 10;
+    this.liftState = false;
+    this.space = 20;
+    this.animationState = 1;
+    this.animation2 = "false";
+  }
+  display(){
+    noStroke();
+    imageMode(CENTER);
+    fill(this.colour);
+    if(this.animation2 === "false"){
+      image(healerImage, this.x, this.y, this.width, this.height);
+    }
+    else if(this.animation2 === "true"){
+      image(healerImage2, this.x, this.y, this.width, this.height);
+    }
+    fill(100, 200, 75, 50);
+    circle(this.x, this.y, this.healRange);
+  }
+  heal(theTroops){
+    for(let troop of theTroops){
+      let healDistance = dist(this.x, this.y, troop.x, troop.y);
+      if(healDistance < this.healRange && theEnemies.length > 1 && frameCount%60 === 0){
+        if(troop.identify === "spear" && troop.health <= 51){
+          troop.health += this.healthPlus;
+          if(this.animationState === 1 && millis() > healtime){
+            this.animation2 = "true";
+            healtime = millis() + 1000;
+            this.animationState = 2;
+          }
+        }
+        else if(troop.identify === "sword" && troop.health <= 60){
+          troop.health += this.healthPlus;
+          if(this.animationState === 1 && millis() > healtime){
+            this.animation2 = "true";
+            healtime = millis() + 1000;
+            this.animationState = 2;
+          }
+        }
+      }
+    }
+    if(healtime < millis()){
+      this.animation2 = "false";
+      this.animationState = 1;
+    }
+  }
+
+  // checks if the player is trying to move the troops
+  mouseMoveSetup(){
+    // checks values to see if the player is trying to move
+    if(mouseX > this.x - this.width/2  && mouseX < this.x + this.width/2 && mouseY > this.y - this.height/2 && mouseY < this.y + this.height/2 && mouseIsPressed && keyIsDown(68) === false){
+      // moves the troop around
+      this.liftState = true;
+      doubleCheck = "yes";
+      doubleCheckHelper = millis() + this.delay;
+      lifted = true;
+    }
+    else{
+      // doesn't move your troops around
+      this.liftState = false;
+      lifted = false;
+    }
+  }
+
+  // moves troops
+  mouseMove(){
+    if(this.liftState){
+      // makes troop track the mouse
+      this.x = mouseX;
+      this.y = mouseY;
+
+    }
+  }
+
+  // makes sure the troop is in the bounds
+  boundsCheck(){
+    if(this.x > width){
+      this.x -= 10;
+    }
+    if(this.x < 0){
+      this.x +=10;
+    }
+    if(this.y > height){
+      this.y -= 10;
+    }
+    if(this.y < 0){
+      this.y +=10;
+    }
+  }
+
+  // makes sure you can't stack troops on top of one another
+  spaceOut(trooper){
+    // goes through all the troops
+    for(let i = trooper.length - 1; i >= 0; i--){
+      // makes sure the troop cannot target itself
+      if(this !== trooper[i] && trooper.length > 1 && lifted){
+        // checks the distance of the troops
+        if(dist(this.x, this.y, trooper[i].x, trooper[i].y) - 15 < this.space){
+          // moves troops away if they are too close
+          if(this.x - trooper[i].x < this.space){
+            trooper[i].x += this.space;
+          }
+          if(this.x - trooper[i].x > this.space){
+            trooper[i].x -= this.space;
+          }
+          if(this.y - trooper[i].y < this.space){
+            trooper[i].y += this.space;
+          }
+          if(this.y - trooper[i].y > this.space){
+            trooper[i].y -= this.space;
+          }
+          if(this.x === trooper[i].x){
+            trooper[i].x += this.space;
+          }
+        }
+      }
+    }
+  }
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 }
@@ -960,8 +1096,13 @@ function draw() {
       troops.mouseMoveSetup();
       // makes sure the troops don't stack
       troops.spaceOut(theTroops);
-      // lets troops attack enemies
-      troops.attackTroops(theEnemies);
+      if(troops.identify === "spear" || troops.identify === "sword"){
+        // lets troops attack enemies
+        troops.attackTroops(theEnemies);
+      }
+      else{
+        troops.heal(theTroops);
+      }
     }
   }
   // carries out functions needed to control the enemies
@@ -1057,6 +1198,11 @@ function mousePressed(){
     theEnemies.push(someEnemy);
   }
 
+  if(keyIsDown(72)){
+    let someTroop = new Healer(mouseX, mouseY);
+    theTroops.push(someTroop);
+  }
+
   if(keyIsDown(65)){
     let someEnemy = new Skeleton(mouseX, mouseY);
     theEnemies.push(someEnemy);
@@ -1080,6 +1226,8 @@ function spawnEnemies(){
   }
   // spawns new enemies if the player starts the bext wave
   if(theEnemies.length < 1 && keyIsDown(81)){
+    // increases the round number
+    roundCounter ++;
     // adds enemies based on the danger score
     while(roundDanger > 0){
       if(roundCounter > 1){
@@ -1121,8 +1269,6 @@ function spawnEnemies(){
     }
     // increases danger score for next round
     dangerScore += Math.round(random(3,7))*10*roundCounter;
-    // increases the round number
-    roundCounter ++;
     console.log(theEnemies.length);
   }
 }
@@ -1157,15 +1303,59 @@ function pause(){
   }
   // displays pause text so that the player knows what the game is about
   if(gameState === "pause"){
-    textAlign(CENTER, CENTER);
-    textSize(30);
-    fill("red");
-    textSize(15);
-    text("Press the mouse and Z to spawn a sword troop, press the mouse and D to spawn a spear troop", width/2, height/2 + height/10);
-    text("If you press and hold one one the troops with your mouse you can move them around", width/2, height/2 + height/7.5);
-    text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
-    text("your coins are displayed at the top of the screen you get more by killing enemies, and can use them to buy troops", width/2, height/2 +height/10 +height/15);
-    text("press P to unpause", width/2, height/2 + height/5);
+    if(seeState === "main"){
+      textAlign(CENTER, CENTER);
+      textSize(30);
+      fill("red");
+      textSize(15);
+      text("Press Z to learn about sword troop, press D to learn about spear troop, press H to learn about the healer", width/2, height/2 + height/10);
+      text("If you press and hold one one the troops with your mouse you can move them around", width/2, height/2 + height/7.5);
+      text("Don't let the enemies touch the right wall, you lose if they do", width/2, height/2 + height/15);
+      text("Your coins are displayed at the top of the screen you get more by killing enemies, and can use them to buy troops", width/2, height/2 +height/10 +height/15);
+      text("Press P to unpause", width/2, height/2 + height/5);
+    }
+    if(keyIsDown(90) && seeState === "main" && millis() > q){ // sword troop
+      seeState = "sword";
+      q = millis() + 500;
+    }
+    else if(keyIsDown(68) && seeState === "main" && millis() > q){ // spear troop
+      seeState = "spear";
+      q = millis() + 500;
+    }
+    else if(keyIsDown(72) && seeState === "main" && millis() > q){ // healer
+      seeState = "healer";
+      q = millis() + 500;
+    }
+    if(seeState === "sword"){
+      textSize(15);
+      fill("red");
+      text("The sword troop is short range melee troop, costing 20 coins. Press the mouse and Z to spawn a sword troop.", width/2, height/2 + height/10);
+      text("Press Z to return to main pause menu", width/2, height/2 + height/7.5);
+      if(keyIsDown(90) && millis() > q){
+        seeState = "main";
+        q = millis() + 500;
+      }
+    }
+    if(seeState === "spear"){
+      textSize(15);
+      fill("red");
+      text("The spear troop is mid range melee troop doing less damage at close range, costing 30 coins. Press the mouse and D to spawn a spear troop.", width/2, height/2 + height/10);
+      text("Press D to return to main pause menu", width/2, height/2 + height/7.5);
+      if(keyIsDown(68) && millis() > q){
+        seeState = "main";
+        q = millis() + 500;
+      }
+    }
+    if(seeState === "healer"){
+      textSize(15);
+      fill("red");
+      text("The healer troop does not do damage but does heal troops in its healing aura. Press the mouse and H to spawn a healer.", width/2, height/2 + height/10);
+      text("Press H to return to main pause menu", width/2, height/2 + height/7.5);
+      if(keyIsDown(72) && millis() > q){
+        seeState = "main";
+        q = millis() + 500;
+      }
+    }
   }
   // tells the player how to pause and what they can see in the pause menu
   if(gameState === "go"){
@@ -1175,7 +1365,7 @@ function pause(){
     text("Press P to pause the game and see the controls", 0, height/30);
   }
   // starts the game
-  if(gameState === "start" && keyIsDown(71)){
+  if((gameState === "start" || gameState === "over") && keyIsDown(71)){
     gameState = "go";
   }
   // start screen 
@@ -1190,7 +1380,7 @@ function pause(){
     textAlign(CENTER, CENTER);
     textSize(30);
     fill(0);
-    text("You died, reload the page to restart", width/2, height/2);
+    text("You died, press G to restart.", width/2, height/2);
   }
 }
 
@@ -1199,5 +1389,15 @@ function theEndAndTheDeath(){
     if(enemy.x >= width){
       gameState = "over";
     }
+    }
+  if(gameState === "over"){
+    theEnemies.splice(0, theEnemies.length);
+    theTroops.splice(0,theTroops.length);
+    coins = 300;
+    roundCounter = 0;
+    dangerScore = 100;
+  }
+  if(keyIsDown(71)){
+    gameState = "go";
   }
 }

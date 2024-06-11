@@ -663,6 +663,11 @@ class Skeleton{
     else{
       image(skeleImage,this.x, this.y, this.width, this.height);
     }
+
+    // creates health bar
+    fill(this.colour);
+    rectMode(CENTER);
+    rect(this.x, this.y - this.height + 15, this.health/2, 3);
   }
 
   // dead code

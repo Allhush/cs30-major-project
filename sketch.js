@@ -134,6 +134,8 @@ class SwordTroop{
     this.enemyCount = 0;
     this.enemyX = width;
     this.enemyY = height;
+    this.enemyNumbers = 0;
+    this.closestTroopIndex = -1;
   }
 
   // displays the troop
@@ -151,32 +153,66 @@ class SwordTroop{
 
   // lets troops attack enemies
   attackTroops(theEnemies){
-    // goes through all the enemies
-    for(let target of theEnemies){
-      // checks range
-      let enemyDistance = dist(this.x, this.y, target.x, target.y);
-      // attacks enemies
-      if(enemyDistance < this.range && frameCount%60 === 0){
-        if(this.enemyCount <= 2){
-          target.health -= this.damage;
-          console.log("damage1");
-        }
-        else if(this.enemyCount < 5){
-          target.health -= this.damage/2;
-          console.log("damage2");
-        }
-        else{
-          target.health -= this.damage/5;
-          console.log("damage3");
-        }
-        // plays sound effect
-        if(target.health < 10){
-          this.enemyCount --;
-        }
-        swordSlash.play();
+    if(theEnemies.length < this.enemyNumbers){
+      // resets targeting for the enemies
+      this.enemyX = width;
+      this.enemyY = height;
+    }
+    for(let target = theEnemies.length - 1; target >= 0; target --){
+      // checks the distance of the current troop in the array
+      this.enemyDistance = dist(this.x, this.y, theEnemies[target].x, theEnemies[target].y);
+      // checks if another troop is closer
+      if(this.enemyDistance < dist(this.x, this.y, this.enemyX, this.enemyY)){
+        // resets target if it is closer
+        this.enemyX = theEnemies[target].x;
+        this.enemyY = theEnemies[target].y;
+        // targets the new troops]
+        this.closestTroopIndex = target;
+        console.log(this.closestTroopIndex);
+      }
+      else{
+        // resets circuit to see if another troop is closer
+        this.enemyNumbers = theTroops.length;
       }
     }
+
+    // attacks enemies
+    let enemyDistance = dist(this.x, this.y, this.enemyX, this.enemyY);
+    if(enemyDistance < this.range && frameCount%15 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
+      theEnemies[this.closestTroopIndex].health -= this.damage;
+      // plays sound effect
+      swordSlash.play();
+      console.log("damaging");
+      this.closestTroopIndex = -1;
+    }
+    // old sword attack code
+    // // goes through all the enemies
+    // // for(let target of theEnemies){
+    // //   // checks range
+    // //   let enemyDistance = dist(this.x, this.y, target.x, target.y);
+    // //   // attacks enemies
+    // //   if(enemyDistance < this.range && frameCount%60 === 0){
+    // //     if(this.enemyCount <= 2){
+    // //       target.health -= this.damage;
+    // //       console.log("damage1");
+    // //     }
+    // //     else if(this.enemyCount < 5){
+    // //       target.health -= this.damage/2;
+    // //       console.log("damage2");
+    // //     }
+    // //     else{
+    // //       target.health -= this.damage/5;
+    // //       console.log("damage3");
+    // //     }
+    // //     // plays sound effect
+    // //     if(target.health < 10){
+    // //       this.enemyCount --;
+    // //     }
+    // //     swordSlash.play();
+    // //   }
+    // // }
   }
+
 
   mouseMoveSetup(){
     // checks values to see if the player is trying to move
@@ -329,11 +365,6 @@ class SpearMan{
       }
     }
     
-    // if(theEnemies.length < this.enemyNumbers){
-    //   // resets targeting for the enemies
-    //   this.enemyX = width;
-    //   this.enemyY = height;
-    // }
     // attacks enemies
     let enemyDistance = dist(this.x, this.y, this.enemyX, this.enemyY);
     if(enemyDistance < this.range1 && enemyDistance > this.range2 && frameCount%60 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
@@ -801,7 +832,7 @@ class Skeleton{
 }
 
 class BossMonster{
-  constructor(x,y){
+  constructor(x,y, z){
     this.identify = "BossMonster";
     this.x = x;
     this.y = y;
@@ -1299,7 +1330,7 @@ function mousePressed(){
   }
 
   if(keyIsDown(66)){
-    let someEnemy = new BossMonster(mouseX, mouseY);
+    let someEnemy = new BossMonster(mouseX, mouseY, 1);
     theEnemies.push(someEnemy);
   }
 }
@@ -1355,7 +1386,7 @@ function spawnEnemies(){
     // spawns bosses every 5 rounds 
     if(roundCounter%5 ===0 && roundCounter > 1){
       for(let i = bossCount; i > 0; i--){
-        let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30));
+        let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30), 1);
         theEnemies.push(someEnemy);
       }
       bossCount ++;

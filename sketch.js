@@ -69,12 +69,16 @@ let bossImage2OW;
 let seeState = "main";
 // used to time healer animation
 let healtime = 0;
+// used to make boss animation
+let bossAttack = 0;
+// decides how many bosses to spawn
+let bossCount = 1;
 
 function preload(){
- // swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
- // zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
- // skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
- // spearSound = loadSound("Assets/soundEffects/spear.mp3");
+  swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
+  zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
+  skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
+  spearSound = loadSound("Assets/soundEffects/spear.mp3");
   swordImage = loadImage("Assets/Images/Sword1.png");
   // swordImage2 = loadImage("Assets/Images/Sword2.png");
   spearImage = loadImage("Assets/Images/Spear1.png");
@@ -88,9 +92,11 @@ function preload(){
   zombieOWImage = loadImage("Assets/Images/zombie1OW.png");
   skeleOWImage = loadImage("Assets/Images/skeleton1OW.png");
   swordOWImage = loadImage("Assets/Images/sword1OW.png");
-  spearOWImage = loadImage("Assets/Images/spearOW.png");
-  bossImage = loadImage("Assets/Images/BossImage1a.png");
-  bossImageOW = loadImage("Assets/Images/BossImage1aOW.png");
+  spearOWImage = loadImage("Assets/Images/spear1OW.png");
+  bossImage = loadImage("Assets/Images/Boss1a.png");
+  bossImageOW = loadImage("Assets/Images/Boss1aOW.png");
+  bossImage2 = loadImage("Assets/Images/Boss2a.png");
+  bossImage2OW = loadImage("Assets/Images/Boss2aOW.png");
 }
 
 // most basic troop that the player can buy
@@ -815,20 +821,37 @@ class BossMonster{
     // makes sure the enemies is a valid target
     this.enemyNumbers = 0;
     this.knockback = 50;
+    this.attacking = "false";
   }
 
   // displays boss
   display(){
     noStroke();
     imageMode(CENTER);
-    if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
-      image(bossImage,this.x, this.y, this.width, this.height);
+    if(this.attacking === "false"){
+      if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+        image(bossImage,this.x, this.y, this.width, this.height);
+      }
+      else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+        image(bossImageOW, this.x, this.y, this.width, this.height); 
+      }
+      else{
+        image(bossImage,this.x, this.y, this.width, this.height);
+      }
     }
-    else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
-      image(bossimageOW, this.x, this.y, this.width, this.height); 
-    }
-    else{
-      image(bossImage,this.x, this.y, this.width, this.height);
+    else if(this.attacking === "true"){
+      if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+        image(bossImage2,this.x, this.y, this.width, this.height);
+      }
+      else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+        image(bossImage2OW, this.x, this.y, this.width, this.height); 
+      }
+      else{
+        image(bossImage2,this.x, this.y, this.width, this.height);
+      }
+      if(millis() > bossAttack){
+        this.attacking = "false";
+      }
     }
   }
 
@@ -837,6 +860,10 @@ class BossMonster{
       // checks of the troop is close enough to attack
       this.enemyDistance = dist(this.x, this.y, target.x, target.y);
       if(this.enemyDistance < this.range && frameCount%30 === 0){
+        if(millis() > bossAttack){
+          this.attacking = "true";
+          bossAttack = millis() + 500;
+        }
         // does damage to the enemy
         target.health -= this.damage;
         // does knockback to enemy
@@ -1198,14 +1225,14 @@ function killTheDead(){
   for(let i = theEnemies.length - 1; i >= 0; i --){
     // checks to see if the enemies still have health
     if(theEnemies[i].health <= 0){
-      if(roundCounter <= 5){
+      if(roundCounter <= 3){
         // add enemy coins to purse
         coins += theEnemies[i].coin;
       }
-      else if(roundCounter <= 10 || theEnemies[i].identify === "BossMonster"){
+      else if(roundCounter <= 5 || theEnemies[i].identify === "BossMonster"){
         coins += Math.round(theEnemies[i].coin/2);
       }
-      else if (roundCounter <= 20){
+      else if (roundCounter <= 10){
         coins += 5;
       }
       else{
@@ -1318,8 +1345,11 @@ function spawnEnemies(){
     }
     // spawns bosses every 5 rounds 
     if(roundCounter%5 ===0 && roundCounter > 1){
-      let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30));
-      theEnemies.push(someEnemy);
+      for(let i = bossCount; i > 0; i--){
+        let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30));
+        theEnemies.push(someEnemy);
+      }
+      bossCount ++;
     }
     // increases danger score for next round
     dangerScore += Math.round(random(3,7))*10*roundCounter;

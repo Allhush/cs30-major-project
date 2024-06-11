@@ -79,24 +79,24 @@ function preload(){
   zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
   skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
   spearSound = loadSound("Assets/soundEffects/spear.mp3");
-  swordImage = loadImage("Assets/Images/Sword1.png");
+  swordImage = loadImage("Assets/images/Sword1.png");
   // swordImage2 = loadImage("Assets/Images/Sword2.png");
-  spearImage = loadImage("Assets/Images/Spear1.png");
+  spearImage = loadImage("Assets/images/Spear1.png");
   // spearImage2 = loadImage("Assets/Images/Spear2.png");
-  zombieImage = loadImage("Assets/Images/Zombie1.png");
+  zombieImage = loadImage("Assets/images/Zombie1.png");
   // zombieImage2 = loadImage("Assets/Images/Zombie2.png");
-  skeleImage = loadImage("Assets/Images/Skeleton1.png");
+  skeleImage = loadImage("Assets/images/Skeleton1.png");
   // skeleImage2 = loadImage("Assets/Images/Skeleton2.png");
-  healerImage = loadImage("Assets/Images/Healer1.png");
-  healerImage2 = loadImage("Assets/Images/Healer2.png");
-  zombieOWImage = loadImage("Assets/Images/zombie1OW.png");
-  skeleOWImage = loadImage("Assets/Images/skeleton1OW.png");
-  swordOWImage = loadImage("Assets/Images/sword1OW.png");
-  spearOWImage = loadImage("Assets/Images/spear1OW.png");
-  bossImage = loadImage("Assets/Images/Boss1a.png");
-  bossImageOW = loadImage("Assets/Images/Boss1aOW.png");
-  bossImage2 = loadImage("Assets/Images/Boss2a.png");
-  bossImage2OW = loadImage("Assets/Images/Boss2aOW.png");
+  healerImage = loadImage("Assets/images/Healer1.png");
+  healerImage2 = loadImage("Assets/images/Healer2.png");
+  zombieOWImage = loadImage("Assets/images/zombie1OW.png");
+  skeleOWImage = loadImage("Assets/images/skeleton1OW.png");
+  swordOWImage = loadImage("Assets/images/sword1OW.png");
+  spearOWImage = loadImage("Assets/images/spear1OW.png");
+  bossImage = loadImage("Assets/images/Boss1a.png");
+  bossImageOW = loadImage("Assets/images/Boss1aOW.png");
+  bossImage2 = loadImage("Assets/images/Boss2a.png");
+  bossImage2OW = loadImage("Assets/images/Boss2aOW.png");
 }
 
 // most basic troop that the player can buy

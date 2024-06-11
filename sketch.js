@@ -61,30 +61,36 @@ let zombieOWImage;
 let skeleOWImage;
 let swordOWImage;
 let spearOWImage;
+let bossImage;
+let bossImageOW;
+let bossImage2;
+let bossImage2OW;
 // used in pause state so player can see different things
 let seeState = "main";
 // used to time healer animation
 let healtime = 0;
 
 function preload(){
-  swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
-  zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
-  skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
-  spearSound = loadSound("Assets/soundEffects/spear.mp3");
+ // swordSlash = loadSound("Assets/soundEffects/sword-slash-and-swing-185432.mp3");
+ // zombieGroan = loadSound("Assets/soundEffects/zombie.mp3.mp3");
+ // skeleClink = loadSound("Assets/soundEffects/bones-2-88481.mp3");
+ // spearSound = loadSound("Assets/soundEffects/spear.mp3");
   swordImage = loadImage("Assets/Images/Sword1.png");
-  swordImage2 = loadImage("Assets/Images/Sword2.png");
+  // swordImage2 = loadImage("Assets/Images/Sword2.png");
   spearImage = loadImage("Assets/Images/Spear1.png");
-  spearImage2 = loadImage("Assets/Images/Spear2.png");
+  // spearImage2 = loadImage("Assets/Images/Spear2.png");
   zombieImage = loadImage("Assets/Images/Zombie1.png");
-  zombieImage2 = loadImage("Assets/Images/Zombie2.png");
+  // zombieImage2 = loadImage("Assets/Images/Zombie2.png");
   skeleImage = loadImage("Assets/Images/Skeleton1.png");
-  skeleImage2 = loadImage("Assets/Images/Skeleton2.png");
+  // skeleImage2 = loadImage("Assets/Images/Skeleton2.png");
   healerImage = loadImage("Assets/Images/Healer1.png");
   healerImage2 = loadImage("Assets/Images/Healer2.png");
   zombieOWImage = loadImage("Assets/Images/zombie1OW.png");
   skeleOWImage = loadImage("Assets/Images/skeleton1OW.png");
   swordOWImage = loadImage("Assets/Images/sword1OW.png");
   spearOWImage = loadImage("Assets/Images/spearOW.png");
+  bossImage = loadImage("Assets/Images/BossImage1a.png");
+  bossImageOW = loadImage("Assets/Images/BossImage1aOW.png");
 }
 
 // most basic troop that the player can buy
@@ -814,9 +820,16 @@ class BossMonster{
   // displays boss
   display(){
     noStroke();
-    rectMode(CENTER);
-    fill(this.colour);
-    rect(this.x, this.y, this.width, this.height);
+    imageMode(CENTER);
+    if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+      image(bossImage,this.x, this.y, this.width, this.height);
+    }
+    else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+      image(bossimageOW, this.x, this.y, this.width, this.height); 
+    }
+    else{
+      image(bossImage,this.x, this.y, this.width, this.height);
+    }
   }
 
   attackTroops(theTroops){

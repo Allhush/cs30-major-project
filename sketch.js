@@ -178,7 +178,7 @@ class SwordTroop{
 
     // attacks enemies
     let enemyDistance = dist(this.x, this.y, this.enemyX, this.enemyY);
-    if(enemyDistance < this.range && frameCount%15 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
+    if(enemyDistance < this.range && frameCount%20 === 0 && this.closestTroopIndex < theEnemies.length && this.closestTroopIndex >= 0){
       theEnemies[this.closestTroopIndex].health -= this.damage;
       // plays sound effect
       swordSlash.play();
@@ -583,6 +583,7 @@ class Zombie{
     if(this.closestTroopIndex > theTroops.length - 1){
       this.attackState = "calm";
     }
+    
   }
 
   // checks values when player moves troops around
@@ -864,6 +865,10 @@ class BossMonster{
     this.enemyNumbers = 0;
     this.knockback = 50;
     this.attacking = "false";
+    this.health2 = 250;
+    this.damage2 = 75;
+    this.range2 = 50;
+    this.z = z;
   }
 
   // displays boss

@@ -1351,15 +1351,15 @@ function killTheDead(){
   for(let i = theEnemies.length - 1; i >= 0; i --){
     // checks to see if the enemies still have health
     if(theEnemies[i].health <= 0){
-      if(roundCounter <= 3){
+      if(roundCounter <= 4){
         // add enemy coins to purse
         coins += theEnemies[i].coin;
       }
-      else if(roundCounter <= 5 || theEnemies[i].identify === "BossMonster"){
+      else if(roundCounter <= 8 || theEnemies[i].identify === "BossMonster"){
         coins += Math.round(theEnemies[i].coin/2);
       }
-      else if (roundCounter <= 10){
-        coins += 5;
+      else if (roundCounter <= 12){
+        coins += Math.round(theEnemies[i].coins/4);
       }
       else{
         coins +=2;

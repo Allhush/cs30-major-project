@@ -1416,7 +1416,7 @@ function mousePressed(){
   }
 
   if(keyIsDown(66)){
-    let someEnemy = new BossMonster(mouseX, mouseY, 1);
+    let someEnemy = new BossMonster(mouseX, mouseY, Math.round(random(1,5)));
     theEnemies.push(someEnemy);
   }
 }

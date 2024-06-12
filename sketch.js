@@ -69,6 +69,10 @@ let bossImage;
 let bossImageOW;
 let bossImage2;
 let bossImage2OW;
+let bossImage3;
+let bossImage3OW;
+let bossImage4;
+let bossImage4OW;
 // used in pause state so player can see different things
 let seeState = "main";
 // used to time healer animation
@@ -101,6 +105,10 @@ function preload(){
   bossImageOW = loadImage("Assets/Images/Boss1aOW.png");
   bossImage2 = loadImage("Assets/Images/Boss2a.png");
   bossImage2OW = loadImage("Assets/Images/Boss2aOW.png");
+  bossImage3 = loadImage("Assets/Images/Boss1b.png");
+  bossImage2OW = loadImage("Assets/Images/Boss1bOW.png");
+  bossImage4 = loadImage("Assets/Images/Boss2b.png");
+  bossImage4OW = loadImage("Assets/Images/Boss2bOW.png");
 }
 
 // most basic troop that the player can buy
@@ -869,90 +877,135 @@ class BossMonster{
     this.damage2 = 75;
     this.range2 = 50;
     this.z = z;
+    this.speed2 = 2;
   }
 
   // displays boss
   display(){
     noStroke();
     imageMode(CENTER);
-    if(this.attacking === "false"){
-      if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
-        image(bossImage,this.x, this.y, this.width, this.height);
+    // checks if the boss is mutated or not
+    if(this.z !== 5){
+      if(this.attacking === "false"){
+        if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage,this.x, this.y, this.width, this.height);
+        }
+        else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+          image(bossImageOW, this.x, this.y, this.width, this.height); 
+        }
+        else{
+          image(bossImage,this.x, this.y, this.width, this.height);
+        }
       }
-      else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
-        image(bossImageOW, this.x, this.y, this.width, this.height); 
-      }
-      else{
-        image(bossImage,this.x, this.y, this.width, this.height);
+      else if(this.attacking === "true"){
+        if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage2,this.x, this.y, this.width, this.height);
+        }
+        else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage2OW, this.x, this.y, this.width, this.height); 
+        }
+        else{
+          image(bossImage2,this.x, this.y, this.width, this.height);
+        }
+        if(millis() > bossAttack){
+          this.attacking = "false";
+        }
       }
     }
-    else if(this.attacking === "true"){
-      if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
-        image(bossImage2,this.x, this.y, this.width, this.height);
+    else{
+      if(this.attacking === "false"){
+        if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage3,this.x, this.y, this.width, this.height);
+        }
+        else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage3OW, this.x, this.y, this.width, this.height); 
+        }
+        else{
+          image(bossImage3,this.x, this.y, this.width, this.height);
+        }
       }
-      else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
-        image(bossImage2OW, this.x, this.y, this.width, this.height); 
-      }
-      else{
-        image(bossImage2,this.x, this.y, this.width, this.height);
-      }
-      if(millis() > bossAttack){
-        this.attacking = "false";
+      else if(this.attacking === "true"){
+        if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage4,this.x, this.y, this.width, this.height);
+        }
+        else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
+          image(bossImage4OW, this.x, this.y, this.width, this.height); 
+        }
+        else{
+          image(bossImage4,this.x, this.y, this.width, this.height);
+        }
+        if(millis() > bossAttack){
+          this.attacking = "false";
+        }
       }
     }
   }
 
   attackTroops(theTroops){
     for(let target of theTroops){
-      // checks of the troop is close enough to attack
-      this.enemyDistance = dist(this.x, this.y, target.x, target.y);
-      if(this.enemyDistance < this.range && frameCount%30 === 0){
-        if(millis() > bossAttack){
-          this.attacking = "true";
-          bossAttack = millis() + 500;
-        }
-        // does damage to the enemy
-        target.health -= this.damage;
-        // does knockback to enemy
-        if(target.x > this.x){
-          target.x += this.knockback;
-          this.enemyX = width;
-          this.enemyY = height;
-        }
-        else if(target.x < this.x){
-          target.x -= this.knockback;
-          this.enemyX = width;
-          this.enemyY = height;
-        }
-        if(target.y > this.y){
-          target.y += this.knockback;
-          this.enemyX = width;
-          this.enemyY = height;
-        }
-        else if(target.y < this.y){
-          target.y -= this.knockback;
-          this.enemyX = width;
-          this.enemyY = height;
-        }
-        if(target.x === this.x){
-          if(random(2) > 1){
+      // checks if the boss is mutated or not
+      if(this.z !== 5){
+        // checks of the troop is close enough to attack
+        this.enemyDistance = dist(this.x, this.y, target.x, target.y);
+        if(this.enemyDistance < this.range && frameCount%30 === 0){
+          if(millis() > bossAttack){
+            this.attacking = "true";
+            bossAttack = millis() + 500;
+          }
+          // does damage to the enemy
+          target.health -= this.damage;
+          // does knockback to enemy
+          if(target.x > this.x){
             target.x += this.knockback;
+            this.enemyX = width;
+            this.enemyY = height;
           }
-          else{
+          else if(target.x < this.x){
             target.x -= this.knockback;
+            this.enemyX = width;
+            this.enemyY = height;
           }
-          this.enemyX = width;
-          this.enemyY = height;
-        }
-        if(target.y === this.y){
-          if(random(2) > 1){
+          if(target.y > this.y){
             target.y += this.knockback;
+            this.enemyX = width;
+            this.enemyY = height;
           }
-          else{
+          else if(target.y < this.y){
             target.y -= this.knockback;
+            this.enemyX = width;
+            this.enemyY = height;
           }
-          this.enemyX = width;
-          this.enemyY = height;
+          if(target.x === this.x){
+            if(random(2) > 1){
+              target.x += this.knockback;
+            }
+            else{
+              target.x -= this.knockback;
+            }
+            this.enemyX = width;
+            this.enemyY = height;
+          }
+          if(target.y === this.y){
+            if(random(2) > 1){
+              target.y += this.knockback;
+            }
+            else{
+              target.y -= this.knockback;
+            }
+            this.enemyX = width;
+            this.enemyY = height;
+          }
+        }
+      }
+      else{
+        this.enemyDistance = dist(this.x, this.y, target.x, target.y);
+        if(this.enemyDistance < this.range2 && frameCount%30 === 0){
+          if(millis() > bossAttack){
+            this.attacking = "true";
+            bossAttack = millis() + 500;
+          }
+          // does damage to the enemy
+          target.health -= this.damage2;
         }
       }
     }
@@ -1018,28 +1071,54 @@ class BossMonster{
   }
 
   move(){
-    // normal state
-    if(this.attackState === "calm" && this.x < width){
-      this.x += this.speed;
-    }
-    // moves enemy to closest target to attack them
-    if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
-      if(this.enemyX > this.x){
+    // checks if the boss is mutated or not
+    if(this.z !== 5){
+      if(this.attackState === "calm" && this.x < width){
         this.x += this.speed;
       }
-      if(this.enemyY > this.y){
-        this.y += this.speed;
+      // moves enemy to closest target to attack them
+      if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+        if(this.enemyX > this.x){
+          this.x += this.speed;
+        }
+        if(this.enemyY > this.y){
+          this.y += this.speed;
+        }
+        if(this.enemyY < this.y){
+          this.y -= this.speed;
+        }
+        if(this.enemyX < this.x){
+          this.x -= this.speed;
+        }
       }
-      if(this.enemyY < this.y){
-        this.y -= this.speed;
-      }
-      if(this.enemyX < this.x){
-        this.x -= this.speed;
+      // makes sure the enemies are in agitation range
+      if (this.enemyDistance > this.agitationRange){
+        this.attackState = "calm";
       }
     }
-    // makes sure the enemies are in agitation range
-    if (this.enemyDistance > this.agitationRange){
-      this.attackState = "calm";
+    else{
+      if(this.attackState === "calm" && this.x < width){
+        this.x += this.speed2;
+      }
+      // moves enemy to closest target to attack them
+      if(this.attackState === "agitated" && this.x < width && theTroops.length - 1 >= this.closestTroopIndex){
+        if(this.enemyX > this.x){
+          this.x += this.speed2;
+        }
+        if(this.enemyY > this.y){
+          this.y += this.speed2;
+        }
+        if(this.enemyY < this.y){
+          this.y -= this.speed2;
+        }
+        if(this.enemyX < this.x){
+          this.x -= this.speed2;
+        }
+      }
+      // makes sure the enemies are in agitation range
+      if (this.enemyDistance > this.agitationRange){
+        this.attackState = "calm";
+      }
     }
   }
 
@@ -1371,7 +1450,7 @@ function spawnEnemies(){
           roundDanger -= SKELEDANGER;
         }
       }
-      else if(roundCounter > 2){
+      else if(roundCounter > 3){
         let z = random(100);
         if(z > 33){
           let someEnemy = new Zombie(30 + random(-30, 30), random(30, height - 30));
@@ -1393,7 +1472,7 @@ function spawnEnemies(){
     // spawns bosses every 5 rounds 
     if(roundCounter%5 ===0 && roundCounter > 1){
       for(let i = bossCount; i > 0; i--){
-        let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30), 1);
+        let someEnemy = new BossMonster(30 + random(-30, 30), random(30, height - 30), Math.round(random(1,5)));
         theEnemies.push(someEnemy);
       }
       bossCount ++;
@@ -1457,7 +1536,7 @@ function pause(){
       seeState = "healer";
       q = millis() + 500;
     }
-    if(seeState === "sword"){
+    if(seeState === "sword"){ // explains sword troop
       textSize(15);
       fill("red");
       text("The sword troop is short range melee troop, costing 20 coins. Press the mouse and Z to spawn a sword troop.", width/2, height/2 + height/10);
@@ -1467,7 +1546,7 @@ function pause(){
         q = millis() + 500;
       }
     }
-    if(seeState === "spear"){
+    if(seeState === "spear"){ // explains spear troop
       textSize(15);
       fill("red");
       text("The spear troop is mid range melee troop doing less damage at close range, costing 30 coins. Press the mouse and D to spawn a spear troop.", width/2, height/2 + height/10);
@@ -1477,7 +1556,7 @@ function pause(){
         q = millis() + 500;
       }
     }
-    if(seeState === "healer"){
+    if(seeState === "healer"){ // explains healer
       textSize(15);
       fill("red");
       text("The healer troop does not do damage but does heal troops in its healing aura. Press the mouse and H to spawn a healer.", width/2, height/2 + height/10);
@@ -1506,7 +1585,7 @@ function pause(){
     fill(0);
     text("press G to start", width/2, height/2);
   }
-
+  // gives game over text
   if(gameState === "over"){
     textAlign(CENTER, CENTER);
     textSize(30);
@@ -1515,19 +1594,24 @@ function pause(){
   }
 }
 
+// game over set up and checker
 function theEndAndTheDeath(){
+  // checks if player is beaten
   for(let enemy of theEnemies){
     if(enemy.x >= width){
       gameState = "over";
     }
   }
+  //resets variables needed
   if(gameState === "over"){
     theEnemies.splice(0, theEnemies.length);
     theTroops.splice(0,theTroops.length);
     coins = 300;
     roundCounter = 0;
     dangerScore = 100;
+    bossCount = 1;
   }
+  // resets the game if you press G
   if(keyIsDown(71)){
     gameState = "go";
   }

@@ -176,7 +176,7 @@ class SwordTroop{
         this.enemyY = theEnemies[target].y;
         // targets the new troops]
         this.closestTroopIndex = target;
-        console.log(this.closestTroopIndex);
+        // console.log(this.closestTroopIndex);
       }
       else{
         // resets circuit to see if another troop is closer
@@ -190,7 +190,7 @@ class SwordTroop{
       theEnemies[this.closestTroopIndex].health -= this.damage;
       // plays sound effect
       swordSlash.play();
-      console.log("damaging");
+      // console.log("damaging");
       this.closestTroopIndex = -1;
     }
     // old sword attack code
@@ -507,11 +507,11 @@ class Zombie{
     fill(this.colour);
     if(this.x - this.enemyX < 0 && this.enemyDistance < this.agitationRange){
       image(zombieImage,this.x, this.y, this.width, this.height);
-      console.log("change 1");
+      // console.log("change 1");
     }
     else if(this.x - this.enemyX > 0 && this.enemyDistance < this.agitationRange){
       image(zombieOWImage, this.x, this.y, this.width, this.height); 
-      console.log("change 2");
+      // console.log("change 2");
     }
     else{
       image(zombieImage,this.x, this.y, this.width, this.height);
@@ -523,10 +523,10 @@ class Zombie{
     rect(this.x, this.y - this.height + 15, this.health/2, 3);
   }
 
-  // dead code
+  // dead code was used to test in the beginning
   registerDeath(){
     if(this.health <= 0){
-      console.log("I'm dead");
+      // console.log("I'm dead");
     }
   }
 
@@ -566,7 +566,7 @@ class Zombie{
         // tells zombie it can count to enemy damage drop off again
         this.counter = true;
         // test stuff, not important
-        console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
+        // console.log(dist(this.x, this.y, this.enemyX, this.enemyY));
       }
       else{
         // resets circuit to see if another troop is closer
@@ -630,7 +630,7 @@ class Zombie{
       if(dist(this.x, this.y, this.enemyX, this.enemyY) < this.agitation && this.counter){
         theTroops[this.closestTroopIndex].enemyCount ++;
         this.counter = false;
-        console.log("yes");
+        // console.log("yes");
       }
     }
     // makes sure the enemies are in agitation range
@@ -719,7 +719,7 @@ class Skeleton{
   // dead code
   registerDeath(){
     if(this.health <= 0){
-      console.log("I'm dead");
+      // console.log("I'm dead");
     }
   }
 
@@ -1479,7 +1479,7 @@ function spawnEnemies(){
     }
     // increases danger score for next round
     dangerScore += Math.round(random(3,7))*10*roundCounter;
-    console.log(theEnemies.length);
+    // console.log(theEnemies.length);
   }
 }
 

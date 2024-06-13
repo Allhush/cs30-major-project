@@ -1355,14 +1355,14 @@ function killTheDead(){
         // add enemy coins to purse
         coins += theEnemies[i].coin;
       }
-      else if(roundCounter <= 8 || theEnemies[i].identify === "BossMonster"){
+      else if(roundCounter <= 8){
         coins += Math.round(theEnemies[i].coin/2);
       }
       else if (roundCounter <= 12){
-        coins += Math.round(theEnemies[i].coins/4);
+        coins += Math.round(theEnemies[i].coins/(7/3));
       }
       else{
-        coins +=2;
+        coins +=Math.round(theEnemies[i].coins/4);
       }
       // gets rid of enemy
       theEnemies.splice(i, 1);

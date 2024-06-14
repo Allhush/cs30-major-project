@@ -22,4 +22,4 @@ I also managed to complete some of my "nice to have" list such as
     - healer
 
 ## Were there any problems you could not solve?
-Yes, originally I wanted the skeletons to also target spear and healer troops over the regular sword troops as well as being faster and stronger. I tried to get them to target 
+Yes, originally I wanted the skeletons to target spear and healer troops over the regular sword troops as well as being faster and stronger. I tried to get them to target "Higher value" targets for a while, however it didn't work and I scraped the system because it was messing with the games other systems. 

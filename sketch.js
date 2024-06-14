@@ -2,12 +2,7 @@
 // Alliam Hushagen
 // Wednesday May 1st 2024
 //
-// most proud of
-// the targeting system(it took forever)
-// - using it for the eneimes to target the troops
-// - adapting it to use for the spear troops
-// - keeping the targeting system working even when you're moving things around 
-// getting the boss knockback system to work 
+// Added and adapted targeting system to serve in almost all characters
 
 // cost of sword troop
 const SWORDCOST = 20;

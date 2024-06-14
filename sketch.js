@@ -1351,7 +1351,7 @@ function killTheDead(){
   for(let i = theEnemies.length - 1; i >= 0; i --){
     // checks to see if the enemies still have health
     if(theEnemies[i].health <= 0){
-      if(roundCounter <= 4){
+      if(roundCounter <= 6){
         // add enemy coins to purse
         coins += theEnemies[i].coin;
       }
@@ -1478,7 +1478,7 @@ function spawnEnemies(){
       bossCount ++;
     }
     // increases danger score for next round
-    dangerScore += Math.round(random(3,7))*10*roundCounter;
+    dangerScore += Math.round(random(3,7))*10*(roundCounter/2);
     // console.log(theEnemies.length);
   }
 }
